@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Lexend', sans-serif;
+  @apply antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-800/50 rounded-full;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-500;
+}
+
+/* Panel sayfa: yumuşak gradient + nokta desen */
+.panel-page {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(14 165 233 / 0.08), transparent),
+    radial-gradient(circle at 1px 1px, rgb(148 163 184 / 0.14) 1px, transparent 0);
+  background-size: 100% 100%, 24px 24px;
+  background-position: 0 0, 0 0;
+}
+.dark .panel-page {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(14 165 233 / 0.06), transparent),
+    radial-gradient(circle at 1px 1px, rgb(71 85 105 / 0.2) 1px, transparent 0);
+}
+.panel-title {
+  @apply text-2xl font-bold tracking-tight text-slate-900 dark:text-white;
+}
+.panel-subtitle {
+  @apply text-sm text-slate-500 dark:text-slate-400 mt-1;
+}
+.panel-section-title {
+  @apply text-base font-semibold text-slate-800 dark:text-slate-200;
+}
+
+/* Kartlar: derinlik + hover hafif yükselme */
+.panel-card {
+  @apply rounded-2xl border border-slate-200/80 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden transition-all duration-200;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+}
+.panel-card:hover {
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  @apply -translate-y-0.5;
+}
+.dark .panel-card {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.15);
+}
+.dark .panel-card:hover {
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.2);
+}
+
+.panel-stat-card {
+  @apply relative rounded-2xl border border-slate-200/80 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden border-t-4 transition-all duration-200;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+}
+.panel-stat-card:hover {
+  box-shadow: 0 8px 20px -5px rgb(0 0 0 / 0.08);
+  @apply -translate-y-0.5;
+}
+
+.panel-card-inner {
+  @apply rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden;
+  box-shadow: 0 8px 24px -4px rgb(0 0 0 / 0.1), 0 4px 8px -4px rgb(0 0 0 / 0.06);
+}
+
+.input-panel {
+  @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/25 focus:border-primary transition-all duration-200;
+}
+.btn-primary-panel {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-dark transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0;
+  box-shadow: 0 2px 8px -2px rgb(14 165 233 / 0.4);
+}
+.btn-secondary-panel {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-xl;
+}
+.badge-stage {
+  @apply inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider;
+}
+
+/* Tablo */
+.table-header-row {
+  @apply bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-800/80 border-b-2 border-slate-200 dark:border-slate-700;
+}
+.table-th {
+  @apply px-3 sm:px-6 py-3 sm:py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400;
+}
+.table-td {
+  @apply px-3 sm:px-6 py-3 sm:py-4 text-sm text-slate-700 dark:text-slate-300;
+}
+.table-row-hover {
+  @apply transition-colors;
+}
+.table-row-zebra:nth-child(even) {
+  @apply bg-slate-50/60 dark:bg-slate-800/30;
+}
+.table-row-zebra:hover {
+  @apply bg-primary/5 dark:bg-primary/10;
+}

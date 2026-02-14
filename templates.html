@@ -1,0 +1,1895 @@
+<!-- Inbox View -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Inbox View - EduConsult CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
+<!-- Top Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 shrink-0 z-30">
+<div class="flex items-center gap-4 w-1/4">
+<div class="bg-primary p-2 rounded-lg flex items-center justify-center">
+<span class="material-icons-outlined text-white">school</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-800 dark:text-white">EduConsult</span>
+</div>
+<div class="flex-1 max-w-2xl px-4">
+<div class="relative group">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Search students, emails, or application IDs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4 w-1/4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-full">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+<span class="text-xs font-medium text-green-700 dark:text-green-400">Sync Active</span>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-800">
+<div class="text-right">
+<p class="text-xs font-semibold">Sarah Jenkins</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider">Lead Consultant</p>
+</div>
+<img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-slate-200" data-alt="Professional female consultant profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5keyAy3qUE26cplnGJRh76fpBbI-3Q3dOMloJBTmjATLHPZ1LsjpXqNFZf72-Y3_ed9UX-75qYWSsN21eIMTKtRBKdVgwnrsbv31D7pGbmkTXouMpF5agSneOSOajTW5CP-cLuj0VJye40FGfGgjhEDrt9zvgv-iAfj7-cinMxdKiHge0KpOfRuyRRPV3opBCbyLdQmDeAFKV9wDQtUEX50oTWfHKGhT_YJx30xmRHjAAPFPx4WFHfMWu28oEPnj0VpXSkT0kJa9I"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
+<div class="p-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all">
+<span class="material-icons-outlined text-sm">edit</span>
+                    Compose Message
+                </button>
+</div>
+<nav class="flex-1 overflow-y-auto px-3 space-y-6">
+<!-- Main Folders -->
+<div class="space-y-1">
+<a class="flex items-center justify-between px-3 py-2 bg-primary/10 text-primary rounded-lg font-medium group" href="#">
+<div class="flex items-center gap-3">
+<span class="material-icons-outlined text-lg">inbox</span>
+<span class="text-sm">Inbox</span>
+</div>
+<span class="text-xs bg-primary text-white px-2 py-0.5 rounded-full">24</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="material-icons-outlined text-lg">send</span>
+<span>Sent</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="material-icons-outlined text-lg">star_outline</span>
+<span>Starred</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="material-icons-outlined text-lg">drafts</span>
+<span>Drafts</span>
+</a>
+</div>
+<!-- Stage-based Filters -->
+<div>
+<h3 class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Application Stages</h3>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+<span>New Leads</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span>
+<span>Applied</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+<span>Reviewing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-sm transition-colors" href="#">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span>Visa Processing</span>
+</a>
+</div>
+</div>
+<!-- Personal Labels -->
+<div>
+<h3 class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Labels</h3>
+<div class="flex flex-wrap gap-2 px-3">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-[10px] rounded-md font-medium text-slate-500 border border-slate-200 dark:border-slate-700">Urgent</span>
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-[10px] rounded-md font-medium text-slate-500 border border-slate-200 dark:border-slate-700">Fall 2024</span>
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-[10px] rounded-md font-medium text-slate-500 border border-slate-200 dark:border-slate-700">Scholarship</span>
+</div>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-2">
+<span class="text-[10px] font-bold text-slate-400 uppercase">Storage</span>
+<span class="text-[10px] font-medium text-slate-500">82%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 82%"></div>
+</div>
+</div>
+</aside>
+<!-- Email List Pane -->
+<section class="w-[400px] border-r border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-900/50 flex flex-col shrink-0">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex items-center justify-between sticky top-0">
+<div class="flex items-center gap-2">
+<input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<button class="material-icons-outlined text-slate-400 text-lg hover:text-slate-600">refresh</button>
+<button class="material-icons-outlined text-slate-400 text-lg hover:text-slate-600">more_vert</button>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-medium text-slate-500">
+<span>1-50 of 4,208</span>
+<button class="material-icons-outlined text-sm">chevron_left</button>
+<button class="material-icons-outlined text-sm">chevron_right</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- List Item 1 (Selected) -->
+<div class="group border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900 border-l-4 border-l-primary p-4 cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<span class="font-bold text-sm text-slate-900 dark:text-slate-100">Chen Wei</span>
+<span class="text-[10px] text-primary font-medium">10:42 AM</span>
+</div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">Inquiry regarding Stanford PhD application documents</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">Dear Sarah, thank you for the feedback on my SOP. I have updated the research section and added...</p>
+<div class="flex gap-2 mt-3">
+<span class="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-[10px] font-semibold rounded uppercase">New Lead</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-semibold rounded uppercase">Stanford</span>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="group border-b border-slate-200/60 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 cursor-pointer transition-colors">
+<div class="flex justify-between items-start mb-1">
+<span class="font-medium text-sm text-slate-600 dark:text-slate-400">Priya Sharma</span>
+<span class="text-[10px] text-slate-400 font-medium">09:15 AM</span>
+</div>
+<p class="text-sm font-medium text-slate-600 dark:text-slate-400 truncate mb-1">Visa appointment confirmed for August 12th</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">I finally secured a slot at the Mumbai consulate. Attached is the...</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-icons-outlined text-slate-400 text-xs">attach_file</span>
+<span class="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-semibold rounded uppercase">Visa Processing</span>
+</div>
+</div>
+<!-- List Item 3 -->
+<div class="group border-b border-slate-200/60 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 cursor-pointer transition-colors bg-white/30 dark:bg-slate-900/30">
+<div class="flex justify-between items-start mb-1">
+<span class="font-bold text-sm text-slate-900 dark:text-slate-100">John Doe (Registrar)</span>
+<span class="text-[10px] text-slate-400 font-medium">Yesterday</span>
+</div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate mb-1">Missing transcript for applicant: Sarah Miller</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">The admissions committee noticed that the official transcripts from...</p>
+<div class="flex gap-2 mt-2">
+<span class="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-semibold rounded uppercase">Urgent</span>
+<span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-semibold rounded uppercase">Applied</span>
+</div>
+</div>
+<!-- Repeating Items for fill -->
+<div class="group border-b border-slate-200/60 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-4 cursor-pointer transition-colors opacity-70">
+<div class="flex justify-between items-start mb-1">
+<span class="font-medium text-sm text-slate-600 dark:text-slate-400">Alex Thompson</span>
+<span class="text-[10px] text-slate-400 font-medium">Yesterday</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 truncate mb-1">Re: IELTS Coaching Schedule</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">Can we reschedule the session to Thursday evening?</p>
+</div>
+<!-- ... more items -->
+</div>
+</section>
+<!-- Email Preview Pane -->
+<section class="flex-1 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+<!-- Email Detail Header -->
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="material-icons-outlined text-slate-400 hover:text-slate-600">archive</button>
+<button class="material-icons-outlined text-slate-400 hover:text-slate-600 text-red-400">report</button>
+<button class="material-icons-outlined text-slate-400 hover:text-slate-600 text-red-500">delete</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+<button class="material-icons-outlined text-slate-400 hover:text-slate-600">mark_email_unread</button>
+<button class="material-icons-outlined text-slate-400 hover:text-slate-600">label</button>
+<button class="bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded hover:bg-primary/20 transition-colors">MOVE TO STAGE</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-icons-outlined text-slate-400">print</span>
+</button>
+<button class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-icons-outlined text-slate-400">open_in_new</span>
+</button>
+</div>
+</div>
+<!-- Email Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-4xl mx-auto">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Inquiry regarding Stanford PhD application documents</h1>
+<div class="flex items-center gap-3">
+<img alt="Sender" class="w-12 h-12 rounded-full object-cover border-2 border-slate-50 dark:border-slate-800" data-alt="Male student profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLovVxKFeVtnuJYyH012UAtz5O-g18lA2DCGN_dCiVTCA3r00381OC_STnb1PjnWWPoRT_38XYAPEcv3y0Kr2GWRuL-8aFkZpbNepCOf6sjvqxg1OoBVgClpf1u662FkeMBjdZtwUkSdy-kiSzt_ctM7U0Aty9jayf5vNN9F1rKZcPIMQOjdf8FRfk9lkMutKb6MHNDQVJkurT8VTI-ItRyBpdYL5sMgZL-rVaK4v9ys8sg5QeXO5yQIrgZm-jxwHFRs66RgrnGDPk"/>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-semibold text-slate-900 dark:text-white">Chen Wei</span>
+<span class="text-sm text-slate-500">&lt;chen.wei.99@example.com&gt;</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span>To: Sarah Jenkins (EduConsult)</span>
+<span class="material-icons-outlined text-[10px]">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-medium text-slate-500">Jun 14, 2024, 10:42 AM</p>
+<div class="mt-2 flex gap-2 justify-end">
+<span class="material-icons-outlined text-slate-400 text-lg cursor-pointer hover:text-yellow-400">star_outline</span>
+<span class="material-icons-outlined text-slate-400 text-lg cursor-pointer hover:text-primary">reply</span>
+</div>
+</div>
+</div>
+<div class="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 space-y-4">
+<p>Hi Sarah,</p>
+<p>I hope this email finds you well. Thank you so much for the detailed feedback you provided on my Statement of Purpose last week. The suggestions regarding my research methodology section were particularly helpful.</p>
+<p>I have made the following updates to my application package:</p>
+<ul class="list-disc pl-5 space-y-2">
+<li>Expanded on the specific lab I wish to join at Stanford.</li>
+<li>Updated my resume to include the latest publication in the IEEE journal.</li>
+<li>Revised the diversity statement as per the university's new guidelines.</li>
+</ul>
+<p>I've attached the updated documents for your final review. Could you please let me know if these are now ready for final submission, or if there's anything else I should clarify before the July 1st deadline?</p>
+<p>Also, I am still waiting for the letter of recommendation from my department head. I will follow up with him today.</p>
+<p>Best regards,<br/>Chen Wei</p>
+</div>
+<!-- Attachments -->
+<div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
+<h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+<span class="material-icons-outlined text-sm">attach_file</span>
+                            3 Attachments
+                        </h4>
+<div class="grid grid-cols-3 gap-4">
+<div class="group relative p-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary transition-all cursor-pointer bg-slate-50 dark:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center rounded-lg text-blue-600">
+<span class="material-icons-outlined">description</span>
+</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">SOP_Stanford_V2.pdf</p>
+<p class="text-[10px] text-slate-500">2.4 MB</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
+<span class="material-icons-outlined text-slate-600 dark:text-slate-300">download</span>
+</div>
+</div>
+<div class="group relative p-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary transition-all cursor-pointer bg-slate-50 dark:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 flex items-center justify-center rounded-lg text-green-600">
+<span class="material-icons-outlined">picture_as_pdf</span>
+</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">Resume_Updated.pdf</p>
+<p class="text-[10px] text-slate-500">1.1 MB</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
+<span class="material-icons-outlined text-slate-600 dark:text-slate-300">download</span>
+</div>
+</div>
+<div class="group relative p-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary transition-all cursor-pointer bg-slate-50 dark:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-slate-200 dark:bg-slate-700 flex items-center justify-center rounded-lg text-slate-600">
+<span class="material-icons-outlined">image</span>
+</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">Publication_Certificate.jpg</p>
+<p class="text-[10px] text-slate-500">850 KB</p>
+</div>
+</div>
+<div class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
+<span class="material-icons-outlined text-slate-600 dark:text-slate-300">download</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Reply Box -->
+<div class="mt-12 p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-800/30">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-icons-outlined text-slate-400">reply</span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Reply to Chen Wei...</span>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+<textarea class="w-full border-none focus:ring-0 text-sm min-h-[100px] resize-none bg-transparent" placeholder="Type your message here..."></textarea>
+<div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
+<span class="material-icons-outlined">format_bold</span>
+</button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
+<span class="material-icons-outlined">link</span>
+</button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
+<span class="material-icons-outlined">attach_file</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">Discard</button>
+<button class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-primary/90 shadow-md transition-all">Send Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Tool Panel (CRM Context) -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 hidden xl:flex flex-col">
+<div class="p-6">
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Student Insight</h3>
+<div class="text-center mb-8">
+<div class="relative inline-block">
+<img alt="Chen Wei" class="w-24 h-24 rounded-2xl object-cover mx-auto shadow-xl" data-alt="Student profile photo for CRM context" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKr6TF1S2Y_DfzeFzftfOTIdnQWMK1s3IY-ULRnu6IIMPugedxkqZo5W0_ejRtaD8JuyTi8rIsixoZiFINgPY670rIEOiauuuLtx_w1HufxWcAnEGG-M-fbxhiEvFFUIFTPrMpcWm__xaRbo4LeZJVgXidxMSl-kq7UKdMJ-fEw31WQXDsh_mRUo5udrAcpnMCWkaBlDq57vC2gCIG1GJTOJ3pLaNoCF3MmldN8RvhUdjSxc3d0nbNIJKEqcUzxU1MM-zTYjZLlp3O"/>
+<span class="absolute -bottom-2 -right-2 bg-yellow-400 text-white w-8 h-8 rounded-lg flex items-center justify-center border-4 border-white dark:border-slate-900">
+<span class="material-icons-outlined text-sm">stars</span>
+</span>
+</div>
+<h2 class="mt-4 text-lg font-bold">Chen Wei</h2>
+<p class="text-sm text-slate-500">Candidate ID: #ST-9921</p>
+</div>
+<div class="space-y-6">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Current Funnel</p>
+<div class="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800 rounded-xl">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+<span class="text-sm font-bold text-yellow-700 dark:text-yellow-400">New Lead</span>
+</div>
+<span class="material-icons-outlined text-yellow-400 text-sm">edit</span>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Target Programs</p>
+<div class="space-y-2">
+<div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+<p class="text-xs font-bold">Computer Science, PhD</p>
+<p class="text-[10px] text-slate-500">Stanford University • Fall 2024</p>
+</div>
+<div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 opacity-60">
+<p class="text-xs font-bold">Data Science, MS</p>
+<p class="text-[10px] text-slate-500">UC Berkeley • Fall 2024</p>
+</div>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase mb-3">Recent Activity</p>
+<div class="space-y-4 relative before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-3 h-3 bg-primary rounded-full border-2 border-white dark:border-slate-900"></div>
+<p class="text-xs font-bold">Email Received</p>
+<p class="text-[10px] text-slate-500">Today, 10:42 AM</p>
+</div>
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-3 h-3 bg-slate-300 rounded-full border-2 border-white dark:border-slate-900"></div>
+<p class="text-xs font-medium">SOP Review Completed</p>
+<p class="text-[10px] text-slate-500">Jun 12, 2024</p>
+</div>
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-3 h-3 bg-slate-300 rounded-full border-2 border-white dark:border-slate-900"></div>
+<p class="text-xs font-medium">Profile Created</p>
+<p class="text-[10px] text-slate-500">Jun 08, 2024</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto p-6 border-t border-slate-200 dark:border-slate-800">
+<button class="w-full py-3 border-2 border-primary text-primary font-bold text-sm rounded-xl hover:bg-primary/5 transition-colors">
+                    View Full CRM Profile
+                </button>
+</div>
+</aside>
+</main>
+</body></html>
+
+<!-- Email Detail View -->
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Email Detail View | CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen">
+<!-- Navigation Header -->
+<header class="sticky top-0 z-30 w-full border-b border-primary/10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors flex items-center justify-center text-primary">
+<span class="material-icons-outlined">arrow_back</span>
+</button>
+<div class="h-6 w-[1px] bg-primary/20"></div>
+<div class="flex items-center gap-2">
+<h1 class="text-lg font-semibold truncate max-w-[400px]">Inquiry regarding F-1 Visa Appointment &amp; Application Timeline</h1>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200">Action Needed</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+<img alt="Gmail" class="w-4 h-4" data-alt="Gmail service icon logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcErRf8OPfO4l9dIwFbCeqEIesMSuILxsBu5Ngq4j-0ijLsvcTsXs9pKdHilPvimdfd9PKvDgCzx5Y4hi56HYoNmU3Ev619Y_lRnDJDxRhjavf2bRLy45y0wI4fkiiB-4cs70bSp0L9gZ_GDsrk4rV3jo0Ueo0zkBfq9zkdTA-MY-3nK9fwvbd-7Y2hzT_O5NDxD8m9dRKWzuyskFrdz_KlZHuGoOgth8lLMDThmd_bJCIr83tle4MT5k84WSoGwQKJ8zU8heh8_2I"/>
+<span class="text-xs font-medium text-primary/80">Synced via OAuth</span>
+</div>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-icons-outlined">archive</span>
+</button>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-icons-outlined">delete_outline</span>
+</button>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-icons-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-12 gap-8">
+<!-- Main Conversation Thread -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<!-- Thread Summary / Toggle -->
+<div class="flex justify-center">
+<button class="text-sm font-medium text-primary hover:underline flex items-center gap-2">
+<span class="material-icons-outlined text-sm">unfold_more</span>
+                    Show 2 previous messages in this thread
+                </button>
+</div>
+<!-- Message Card: Student -->
+<div class="bg-white dark:bg-slate-900 border border-primary/10 rounded-xl shadow-sm overflow-hidden">
+<div class="p-6">
+<div class="flex items-start justify-between mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+                                JC
+                            </div>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-white">Javier Chen</h3>
+<p class="text-sm text-slate-500">to me &lt;javier.chen@student.edu&gt;</p>
+</div>
+</div>
+<div class="text-right">
+<span class="text-sm text-slate-400">Oct 24, 2023, 10:15 AM</span>
+</div>
+</div>
+<div class="prose prose-slate dark:prose-invert max-w-none space-y-4 text-slate-700 dark:text-slate-300">
+<p>Hi Sarah,</p>
+<p>I hope you're doing well. I'm starting to get a bit nervous about the F-1 visa appointment availability in Taipei. I checked the portal this morning and the earliest date is in late January, but my orientation starts on January 15th.</p>
+<p>Could we discuss if there's any way to request an expedited appointment or if I should look into other consulates? Also, I've attached my latest transcript from the fall semester as requested.</p>
+<p>Best regards,<br/>Javier</p>
+</div>
+<!-- Attachments -->
+<div class="mt-8 pt-6 border-t border-primary/5 flex flex-wrap gap-3">
+<div class="group flex items-center gap-3 p-3 border border-primary/10 rounded-lg hover:border-primary/30 transition-all cursor-pointer bg-slate-50 dark:bg-slate-800/50">
+<span class="material-icons-outlined text-primary">description</span>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-slate-700 dark:text-slate-200">Fall_Transcript_2023.pdf</span>
+<span class="text-xs text-slate-400">2.4 MB</span>
+</div>
+<span class="material-icons-outlined text-slate-400 group-hover:text-primary transition-colors">download</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Card: Consultant (Previous Reply) -->
+<div class="bg-primary/5 border border-primary/20 rounded-xl shadow-sm overflow-hidden opacity-80">
+<div class="p-6">
+<div class="flex items-start justify-between mb-6">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="Female consultant professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-m7hZm0F09ImYKm7zOevUbAdTWJ3qjUtXQxCsGp8h_BYtLUdUTaHdX6GAseIVHAwOR0Vxg-kF8mnt4rzNbUjEb4Tp0ubBqaZfcLwf84gP81-ElPCH-s0Qliin7k1pzO9sdq3ml0Vd0lSpFMWlBlpcHFrXNwIHFoVN33sSTYdYlYyQBMrRa_vYznDG91SIZ4Gtccoco1d45VffP_hSjmXvQcLet7xNiyUlH4nTVGTNfIfnf4rSj0hJytA2RzUNjcWwSBCjn0OAosb1"/>
+<div>
+<h3 class="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                    Sarah Miller
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-primary text-white font-bold uppercase tracking-wider">You</span>
+</h3>
+<p class="text-sm text-slate-500">to Javier Chen &lt;javier.chen@student.edu&gt;</p>
+</div>
+</div>
+<div class="text-right">
+<span class="text-sm text-slate-400 text-primary">Replied • Oct 23, 2:45 PM</span>
+</div>
+</div>
+<div class="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400">
+<p>Hi Javier, thanks for reaching out. Please don't worry yet! Once you have your I-20, we can apply for an emergency appointment based on your program start date. Let's make sure all your other documents are ready first...</p>
+</div>
+</div>
+</div>
+<!-- Reply Action Area -->
+<div class="bg-white dark:bg-slate-900 border border-primary/20 rounded-xl shadow-lg">
+<div class="p-4 border-b border-primary/10 flex items-center justify-between">
+<div class="flex gap-4">
+<button class="px-4 py-2 bg-primary text-white rounded-lg font-medium flex items-center gap-2 hover:bg-primary/90 transition-all">
+<span class="material-icons-outlined text-sm">reply</span> Reply
+                        </button>
+<button class="px-4 py-2 bg-primary/10 text-primary rounded-lg font-medium flex items-center gap-2 hover:bg-primary/20 transition-all">
+<span class="material-icons-outlined text-sm">reply_all</span> Reply All
+                        </button>
+</div>
+<div class="flex items-center gap-2 text-slate-400">
+<button class="p-2 hover:text-primary transition-colors"><span class="material-icons-outlined">format_bold</span></button>
+<button class="p-2 hover:text-primary transition-colors"><span class="material-icons-outlined">format_italic</span></button>
+<button class="p-2 hover:text-primary transition-colors"><span class="material-icons-outlined">link</span></button>
+<button class="p-2 hover:text-primary transition-colors"><span class="material-icons-outlined">attach_file</span></button>
+</div>
+</div>
+<div class="p-6">
+<textarea class="w-full h-32 bg-transparent border-none focus:ring-0 text-slate-700 dark:text-slate-300 placeholder-slate-400 resize-none font-display" placeholder="Type your reply here..."></textarea>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center rounded-b-xl">
+<div class="flex items-center gap-4 text-xs text-slate-500">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-primary/30 text-primary focus:ring-primary" type="checkbox"/>
+                            Schedule for later
+                        </label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-primary/30 text-primary focus:ring-primary" type="checkbox"/>
+                            Track open status
+                        </label>
+</div>
+<button class="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-all flex items-center gap-2">
+                        Send Message
+                        <span class="material-icons-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sidebar: Student Context -->
+<aside class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Student Profile Card -->
+<div class="bg-white dark:bg-slate-900 border border-primary/10 rounded-xl p-6 shadow-sm">
+<div class="flex flex-col items-center text-center mb-6">
+<div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl mb-4 border-2 border-primary/20">
+                        JC
+                    </div>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Javier Chen</h2>
+<p class="text-sm text-slate-500 mb-4">Undergraduate Applicant • Fall 2024</p>
+<div class="flex gap-2">
+<span class="px-2 py-1 rounded bg-green-100 text-green-700 text-[10px] font-bold uppercase">Active</span>
+<span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase">Priority</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Major</p>
+<p class="text-sm font-medium">B.S. Computer Science</p>
+</div>
+<div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Current Status</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-2">
+<div class="bg-primary h-1.5 rounded-full w-[65%]"></div>
+</div>
+<p class="text-[10px] text-right mt-1 text-slate-500">65% Progress (Visa Stage)</p>
+</div>
+</div>
+<div class="mt-8">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+<span class="material-icons-outlined text-lg">school</span>
+                        Top University Choices
+                    </h3>
+<ul class="space-y-3">
+<li class="flex items-center justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">Stanford University</span>
+<span class="text-xs font-medium text-green-600">Admitted</span>
+</li>
+<li class="flex items-center justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">UC Berkeley</span>
+<span class="text-xs font-medium text-amber-600">Waitlisted</span>
+</li>
+<li class="flex items-center justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400">MIT</span>
+<span class="text-xs font-medium text-slate-400">Pending</span>
+</li>
+</ul>
+</div>
+<button class="w-full mt-8 py-2.5 border border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-all text-sm">
+                    View Full Application File
+                </button>
+</div>
+<!-- CRM Quick Notes -->
+<div class="bg-white dark:bg-slate-900 border border-primary/10 rounded-xl p-6 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center justify-between">
+                    Internal Notes
+                    <button class="text-primary hover:bg-primary/10 p-1 rounded transition-colors">
+<span class="material-icons-outlined text-lg">add</span>
+</button>
+</h3>
+<div class="space-y-4">
+<div class="text-xs text-slate-600 dark:text-slate-400 italic bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border-l-2 border-amber-400">
+                        "User is anxious about visa timelines. Keep a close eye on Taipei consulate openings."
+                        <div class="mt-2 text-[10px] font-bold text-slate-400 not-italic">Added by Sarah • Oct 22</div>
+</div>
+</div>
+</div>
+</aside>
+</main>
+</body></html>
+
+<!-- Consultant Dashboard -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard | EduSync SaaS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body { font-family: 'Lexend', sans-serif; }
+        .sidebar-item-active {
+            background-color: rgba(19, 127, 236, 0.1);
+            color: #137fec;
+            border-right: 3px solid #137fec;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 antialiased">
+<div class="flex min-h-screen">
+<aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hidden md:flex flex-col fixed h-full">
+<div class="p-6 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-round text-white text-xl">school</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-primary">EduSync</span>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="sidebar-item-active flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">dashboard</span>
+                Admin Overview
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">groups</span>
+                Consultants
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">people</span>
+                Student Directory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">mail</span>
+                System Inbox
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">analytics</span>
+                Global Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">vpn_key</span>
+                OAuth Manager
+            </a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-100 dark:border-slate-800">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-all" href="#">
+<span class="material-icons-round">settings</span>
+                Admin Settings
+            </a>
+<div class="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/10">
+<p class="text-xs text-slate-500 mb-2">Instance Status</p>
+<div class="flex items-center gap-2">
+<span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">All Nodes Active</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 md:ml-64 min-h-screen">
+<header class="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 px-8 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Admin Panel</div>
+<h1 class="text-lg font-semibold hidden md:block">Welcome, Master Admin</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-full text-sm w-80 focus:ring-2 focus:ring-primary" placeholder="Search across all students &amp; consultants..." type="text"/>
+</div>
+<button class="relative p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-icons-round">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-800">
+<img alt="Admin Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm3DqnOfMZNFDZb4Qop5CdxGN6T7HDz01_GxQzZeaYR1qzEcSw7cE7fa29vSf4TpC7rEXgdNafwLn9loQoFofHHu2VKeC-LX_68ebFsQMCbZ0jV7h8_UVQQfUpLNUDjHr77rvbuuZIb5rWZi9JE-9gU7o8biO70XGhVEVyJptOX_kZoT4CTGhkAcweSeV35xAtycF4VccS8eWumuVjCal478JpsZMb4E1MQhnPimue918vqAzso1bHZFDqi61jG9BaCfkVx8aGnUep"/>
+<div class="hidden lg:block text-left">
+<p class="text-sm font-semibold">Admin Team</p>
+<p class="text-xs text-primary font-medium">Super User</p>
+</div>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-[1600px] mx-auto">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="text-2xl font-bold">Global Dashboard</h2>
+<p class="text-slate-500">Overview of student engagement and system health across 12 consultants.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+                        Export Data
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add_moderator</span>
+                        Provision Node
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="p-2 bg-blue-50 dark:bg-blue-900/30 text-primary rounded-lg">
+<span class="material-icons-round">school</span>
+</div>
+<span class="text-xs font-medium text-green-500 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">+18.2%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Total Students</p>
+<h3 class="text-3xl font-bold mt-1">642</h3>
+<p class="text-[10px] text-slate-400 mt-2">Active across 4 regional hubs</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 rounded-lg">
+<span class="material-icons-round">mail_lock</span>
+</div>
+<span class="text-xs font-medium text-slate-400">Total Activity</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Emails Tracked</p>
+<h3 class="text-3xl font-bold mt-1">42,891</h3>
+<p class="text-[10px] text-slate-400 mt-2">3,120 emails processed today</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-green-50 dark:bg-green-900/30 text-green-600 rounded-lg">
+<span class="material-icons-round">verified_user</span>
+</div>
+<span class="text-xs font-medium text-green-500 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">98.4%</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">OAuth Connectivity</p>
+<h3 class="text-3xl font-bold mt-1">632</h3>
+<p class="text-[10px] text-slate-400 mt-2">10 accounts require attention</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-red-50 dark:bg-red-900/30 text-red-600 rounded-lg">
+<span class="material-icons-round">warning_amber</span>
+</div>
+<span class="text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-full">Critical</span>
+</div>
+<p class="text-slate-500 text-sm font-medium">Latency Alerts</p>
+<h3 class="text-3xl font-bold mt-1">14</h3>
+<p class="text-[10px] text-slate-400 mt-2">High sync delay detected</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<div class="lg:col-span-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+<div class="p-6 border-b border-slate-100 dark:border-slate-800">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<h3 class="font-bold text-lg">Global Activity Feed</h3>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-medium border border-transparent hover:border-slate-200">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+                                    Filter
+                                </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-medium border border-transparent hover:border-slate-200">
+<span class="material-symbols-outlined text-[16px]">sort</span>
+                                    Sort
+                                </button>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<div class="bg-primary/10 text-primary text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-primary/20">
+                                Type: OAuth Events
+                                <span class="material-icons-round text-[14px] cursor-pointer">close</span>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-transparent">
+                                Status: All
+                                <span class="material-icons-round text-[14px]">expand_more</span>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-transparent">
+                                Date: Last 24h
+                                <span class="material-icons-round text-[14px]">expand_more</span>
+</div>
+<button class="text-slate-400 text-[11px] font-medium hover:text-primary ml-2">Clear all</button>
+</div>
+</div>
+<div class="p-0 flex-1 overflow-x-auto">
+<table class="w-full text-left min-w-[700px]">
+<thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-[10px] uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4 font-bold">Student / Consultant</th>
+<th class="px-6 py-4 font-bold">Event Log</th>
+<th class="px-6 py-4 font-bold">Category</th>
+<th class="px-6 py-4 font-bold">Status</th>
+<th class="px-6 py-4 font-bold text-right">Timestamp</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0">JD</div>
+<div>
+<p class="font-medium text-sm">John Doe</p>
+<p class="text-[10px] text-slate-400">Via: Sarah Miller</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm text-slate-600 dark:text-slate-400 truncate max-w-[200px]">OAuth Token refresh requested</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">Security</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-500 text-[10px] font-bold uppercase rounded">Success</span>
+</td>
+<td class="px-6 py-4 text-right text-xs text-slate-500">Just now</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">AC</div>
+<div>
+<p class="font-medium text-sm">Alice Chen</p>
+<p class="text-[10px] text-slate-400">Via: Kevin Hart</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm text-slate-600 dark:text-slate-400 truncate max-w-[200px]">Bulk email sync completed (42 msgs)</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">Sync</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-500 text-[10px] font-bold uppercase rounded">Success</span>
+</td>
+<td class="px-6 py-4 text-right text-xs text-slate-500">12m ago</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">SW</div>
+<div>
+<p class="font-medium text-sm">S. Williams</p>
+<p class="text-[10px] text-slate-400">Via: Sarah Miller</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm text-slate-600 dark:text-slate-400 truncate max-w-[200px]">Gmail API error 403: Forbidden</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">API Error</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-500 text-[10px] font-bold uppercase rounded">Critical</span>
+</td>
+<td class="px-6 py-4 text-right text-xs text-slate-500">45m ago</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0">MK</div>
+<div>
+<p class="font-medium text-sm">Mark Kapur</p>
+<p class="text-[10px] text-slate-400">Via: Sarah Miller</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm text-slate-600 dark:text-slate-400 truncate max-w-[200px]">Draft submission recorded</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-[10px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">Application</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase rounded">Awaiting</span>
+</td>
+<td class="px-6 py-4 text-right text-xs text-slate-500">1h ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<p class="text-xs text-slate-500">Showing <span class="font-semibold">1-10</span> of <span class="font-semibold">2,450</span> logs</p>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-30" disabled="">
+<span class="material-icons-round text-lg">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-white text-xs font-bold rounded">1</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium rounded">2</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium rounded text-slate-400">...</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium rounded">245</button>
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
+<span class="material-icons-round text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h3 class="font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">hub</span>
+                            Cluster Health
+                        </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-sm">API Gateway</span>
+</div>
+<span class="text-xs font-semibold text-green-500">99.9%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-sm">Auth Server</span>
+</div>
+<span class="text-xs font-semibold text-green-500">Online</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-500"></span>
+<span class="text-sm">Sync Queue</span>
+</div>
+<span class="text-xs font-semibold text-orange-500">Slight Lag</span>
+</div>
+<div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-center mb-1">
+<p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Storage Capacity</p>
+<p class="text-[10px] text-slate-500 font-bold">1.2 TB / 2.0 TB</p>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[60%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<h3 class="font-bold text-sm">System Queue</h3>
+<span class="px-2 py-0.5 bg-red-100 text-red-600 text-[9px] font-bold rounded-full">3 Critical</span>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex gap-3 group items-start">
+<div class="mt-1 bg-red-100 dark:bg-red-900/30 p-1 rounded">
+<span class="material-symbols-outlined text-[14px] text-red-600">lock_reset</span>
+</div>
+<div>
+<p class="text-sm font-medium">Rotate OAuth Secrets</p>
+<p class="text-[11px] text-slate-500">Security requirement: Due in 4h</p>
+</div>
+</div>
+<div class="flex gap-3 group items-start">
+<div class="mt-1 bg-blue-100 dark:bg-blue-900/30 p-1 rounded">
+<span class="material-symbols-outlined text-[14px] text-primary">update</span>
+</div>
+<div>
+<p class="text-sm font-medium">Database Optimization</p>
+<p class="text-[11px] text-slate-500">Scheduled: Tonight 02:00 AM</p>
+</div>
+</div>
+<div class="flex gap-3 group items-start">
+<div class="mt-1 bg-slate-100 dark:bg-slate-800 p-1 rounded">
+<span class="material-symbols-outlined text-[14px] text-slate-500">history</span>
+</div>
+<div>
+<p class="text-sm font-medium">Archive Inactive Students</p>
+<p class="text-[11px] text-slate-500">84 students ready for archival</p>
+</div>
+</div>
+</div>
+<button class="w-full py-3 text-[10px] font-bold text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 border-t border-slate-100 dark:border-slate-800 transition-all uppercase tracking-widest">
+                            Access Control Panel
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
+
+<!-- Student List Page -->
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scalable Student List | EduCRM Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex min-h-screen">
+<aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hidden lg:flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-icons-outlined text-white">school</span>
+</div>
+<span class="font-bold text-xl tracking-tight">EduCRM</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined text-xl">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined text-xl">people_alt</span>
+<span class="font-medium text-sm">Student List</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined text-xl">mail</span>
+<span class="font-medium text-sm">Email Campaigns</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined text-xl">settings</span>
+<span class="font-medium text-sm">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl flex items-center gap-3">
+<img alt="Admin" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgQktu6vGSwz6E8BN33sdCGctQGrKEQBWbrEgQevu7iAfrljK60c0hlRoQNUfuUKNrK-nu0bcU9O4_Vm15kfMGmRjOyMFgGSwGSDcaioy61MGU1CEcmd7VcPah9OlJT6qkZEWVawP4OAxoU_957MZVa4PM1kq0JFK8Gy4Qx05cXHrtIbT1-Bz0UNat4q_YiKfQWSWbp9T5UJqGGbBrzYuYgDfB3uifC0FhtRUfecmUuLnvOOu7QPllP6haznqjPRAvsxUKjnapqBRo"/>
+<div class="overflow-hidden">
+<p class="text-sm font-semibold truncate">Alex Johnson</p>
+<p class="text-xs text-slate-500 truncate text-primary font-medium">Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto">
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 py-6 sticky top-0 z-10">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h1 class="text-2xl font-bold tracking-tight">Student List</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Managing 642 students across your organization</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center gap-2">
+<span class="material-icons-outlined text-sm">file_download</span> Export CSV
+                    </button>
+<button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors inline-flex items-center gap-2 shadow-sm shadow-primary/20">
+<span class="material-icons-outlined text-sm">add</span> Add Student
+                    </button>
+</div>
+</div>
+</header>
+<div class="p-8">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 mb-6 space-y-4">
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-[300px] relative">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-0 rounded-lg text-sm transition-all" placeholder="Search by name, ID, or email..." type="text"/>
+</div>
+<div class="flex items-center gap-3 flex-wrap">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400 uppercase ml-1">Process Stage</span>
+<select class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-0 rounded-lg text-sm py-2 px-3 text-slate-600 dark:text-slate-300 min-w-[140px]">
+<option>All Stages</option>
+<option>Application</option>
+<option>UniAssist</option>
+<option>Visa</option>
+<option>Enrollment</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400 uppercase ml-1">Gmail Status</span>
+<select class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-0 rounded-lg text-sm py-2 px-3 text-slate-600 dark:text-slate-300 min-w-[140px]">
+<option>All Connections</option>
+<option>Connected</option>
+<option>Token Expired</option>
+<option>Disconnected</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400 uppercase ml-1">Consultant</span>
+<select class="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-0 rounded-lg text-sm py-2 px-3 text-slate-600 dark:text-slate-300 min-w-[160px]">
+<option>All Consultants</option>
+<option>Alex Johnson</option>
+<option>Marcus Chen</option>
+<option>Sarah Jenkins</option>
+</select>
+</div>
+<div class="pt-5">
+<button class="p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-outlined">filter_alt_off</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-widest">
+<th class="px-6 py-4">Student</th>
+<th class="px-6 py-4">Process Stage</th>
+<th class="px-6 py-4">Gmail OAuth Status</th>
+<th class="px-6 py-4">Assigned To</th>
+<th class="px-6 py-4">Last Sync</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-semibold text-sm">Amara Okafor</span>
+<span class="text-[11px] text-slate-400">ID: #ST-98234</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Application</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-medium text-emerald-600 dark:text-emerald-400">Connected</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Consultant" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1iViGHhSPsCb5NVbEEZal9PH-S83fUdep1AwOs5g1wBzJbYpHtODcSsPq186jwoNgu_Jy7ijwZDBMM3Rty68-lkUpnwoRR7W9JhOm1RdPoi3D3cXau50uLBnc6K4n0TM6JdknwYVj8CKKwNpMwdoN3m3T2scoE5pn_e-nXOvARrMFw3V2CPuV16vh9_EQFW1_gB-0Jpe60Y_T6Ml_eJG0WwPu8twsE9U3a-hBLjB9PUSX-Xj2NJjaPSwNLUDEK4BPrq_Qq_A4XtZI"/>
+<span class="text-sm">Marcus Chen</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm text-slate-600 dark:text-slate-300">2 hours ago</span>
+<span class="text-[10px] text-slate-400">May 24, 14:30</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-400">
+<span class="material-icons-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors bg-amber-50/30 dark:bg-amber-900/5">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-semibold text-sm">Liam Sørensen</span>
+<span class="text-[11px] text-slate-400">ID: #ST-98235</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">UniAssist</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<span class="text-sm font-medium text-amber-600 dark:text-amber-400">Token Expired</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Consultant" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxdD2H7FwepZtEhWnipxH5TmkbPfDx7PLTLJry1n309yJD7nQUsupcUmCGrQPKIh2F7QaFzhABjKXGCTlsUmKZ69nWZYmIXvw6E93r_AN8z8J6E6Mw9w-A3Iihv9WBLMg3IYJDhwWZJ6V5tvfv9OUNqaLes_cO5-ifS1WRhLTsN6zG0oOSoon057H7xP3e7voOsMjwHDaOFO1MwKC_xIbF40fqxd9VyrrjB6Nsp1SvwVvo2cmbo5ggMWNFvdrGvYHk9YVbg4Waunj0"/>
+<span class="text-sm">Sarah Jenkins</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm text-rose-500 font-medium">Failed 1d ago</span>
+<span class="text-[10px] text-slate-400">May 23, 09:15</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded hover:bg-primary/90 transition-colors shadow-sm">
+                                        RE-AUTH
+                                    </button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-semibold text-sm">Elena Rodriguez</span>
+<span class="text-[11px] text-slate-400">ID: #ST-98238</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Visa</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-sm font-medium text-emerald-600 dark:text-emerald-400">Connected</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Consultant" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJZ4wZ4FmSy1PIZBSJqtGhxSZgXslwJyqY4sxRej_Fx9lyUZRIMPkH-B7w1TY--fTBeseyxjd3sYKC-PsV531IxUd2rIAm37QwdiE0n-Lc1u0jrEqywYtBOmKiB6FeWwt5bQul0VD52yNbqpgTRHLQf2IF-Hj_ZvfFxKZ3UyBrz3QNjpKpoZ9t-ord1x6_He9Ukc73AdaT17FZdkvD3CLfdCey4bPYHwPOAMBnVoHKZGRM3I-Kwx_Ag71HE5wR3PpyUaroClR-4oOB"/>
+<span class="text-sm">Alex Johnson</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm text-slate-600 dark:text-slate-300">3 hours ago</span>
+<span class="text-[10px] text-slate-400">May 24, 13:45</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-400">
+<span class="material-icons-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="font-semibold text-sm">Kenji Yamamoto</span>
+<span class="text-[11px] text-slate-400">ID: #ST-98242</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">Enrollment</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-rose-500"></span>
+<span class="text-sm font-medium text-rose-600 dark:text-rose-400">Disconnected</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="Consultant" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYOB-CGNaCnDjbRijfc5Ge0yed07KKjYykM9bhM76dMV4IVJDVNrSwEDBxRkEpD7sqZNNAYpIz9o7VPZq4mxXWjcooWcepG50v1ZthdI1H9aE6dMjvBncMS_SxrrGHvg6Uh5s8N3yvc9U6omx1mc_Lzl0PAADFxHQP8HkfaPNTIkbn2uMeiPHmqC0SSLDgoB96xqeXmQilemOfEYpnQuXjvOeawPa-boH7p3msMOls3R6JdqvXIiS78NKe_iXK52O4lKux5Hxxhz91"/>
+<span class="text-sm">Sarah Jenkins</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm text-slate-400 italic">Never synced</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors text-slate-400">
+<span class="material-icons-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<span class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-700 dark:text-slate-200">1-50</span> of <span class="font-semibold text-slate-700 dark:text-slate-200">642</span> students</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-400">Rows per page:</span>
+<select class="bg-transparent border-none text-xs font-semibold focus:ring-0 p-0 pr-6 text-slate-600 cursor-pointer">
+<option>50</option>
+<option>100</option>
+<option>250</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-all" disabled="">
+<span class="material-icons-outlined text-lg">first_page</span>
+</button>
+<button class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-all" disabled="">
+<span class="material-icons-outlined text-lg">chevron_left</span>
+</button>
+<div class="flex items-center px-2">
+<span class="text-sm font-medium text-slate-700 dark:text-slate-200">Page 1 of 13</span>
+</div>
+<button class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all">
+<span class="material-icons-outlined text-lg">chevron_right</span>
+</button>
+<button class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all">
+<span class="material-icons-outlined text-lg">last_page</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/50 rounded-xl">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<p class="text-sm font-semibold text-emerald-800 dark:text-emerald-400">Connected</p>
+</div>
+<p class="text-[11px] text-emerald-600 dark:text-emerald-500/80">Active OAuth token. Emails are being synced automatically.</p>
+</div>
+<div class="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 rounded-xl">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+<p class="text-sm font-semibold text-amber-800 dark:text-amber-400">Token Expired</p>
+</div>
+<p class="text-[11px] text-amber-600 dark:text-amber-500/80">OAuth token has expired or was revoked. Student needs to re-authorize the connection.</p>
+</div>
+<div class="p-4 bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/50 rounded-xl">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 rounded-full bg-rose-500"></span>
+<p class="text-sm font-semibold text-rose-800 dark:text-rose-400">Disconnected</p>
+</div>
+<p class="text-[11px] text-rose-600 dark:text-rose-500/80">No active Gmail connection found for this student account.</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
+
+<!-- Student Detail Page -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Detail &amp; Connection Status | Education CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<header class="bg-white dark:bg-slate-900 border-b border-primary/10 px-8 py-4 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto flex justify-between items-center">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-icons-outlined">school</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-primary leading-none">EduCRM</h1>
+<p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">Consultant Portal</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-500 hover:text-primary transition-colors relative">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<div class="flex items-center gap-3 pl-6 border-l border-primary/10">
+<span class="text-sm font-medium">Jordan Smith</span>
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/20">
+<span class="text-xs font-bold text-primary">JS</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-8 py-8">
+<nav class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="material-icons-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Students</a>
+<span class="material-icons-outlined text-xs">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-200 font-medium">Alex Johnson</span>
+</nav>
+<section class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/10 p-6 mb-8">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="flex items-center gap-6">
+<div class="relative">
+<img alt="Student Profile" class="w-24 h-24 rounded-xl object-cover border-2 border-primary/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8XLKScUyUIXyTsMomO5m5PNqPN8DR8ssConoUaHK1oyOS7qGEQfLUZYAf6Md4F35bUh5DGwdzR8JHEYWJfeaV8Kk3Sn7F9kFcst2M1AqS2OZYUafnRjWzIf9BHWxFHf1UUBYufOjbqHLFtqGOzwa3cyVTnaFuPtZZsGXtxltXq44kynXTeR-vNxtUO8rjcW0PlDehkxRL6XYBMde6lwkGY6ALLHEmPDUrWCdKnGvwxJb0LGNMNjIs7nerMNlCBUd6qT7NW5-ZZZN8"/>
+<div class="absolute -bottom-2 -right-2 bg-green-500 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900"></div>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="text-2xl font-bold">Alex Johnson</h2>
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full uppercase tracking-wider">Application Pending</span>
+</div>
+<div class="flex flex-col gap-1 mb-3">
+<p class="text-slate-500 flex items-center gap-2 text-sm">
+<span class="material-icons-outlined text-sm">mail</span>
+                            alex.johnson@example.com
+                        </p>
+<p class="text-primary font-semibold flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-sm">alternate_email</span>
+                            Viewing Mailbox: <span class="underline decoration-primary/30">alex.j.edu@gmail.com</span>
+</p>
+</div>
+<div class="flex flex-wrap gap-4 text-sm">
+<span class="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+<span class="material-icons-outlined text-sm text-slate-400">flag</span> USA
+                        </span>
+<span class="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+<span class="material-icons-outlined text-sm text-slate-400">description</span> MS Computer Science
+                        </span>
+</div>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 min-w-[280px]">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Connection Status</span>
+<span class="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded">
+<span class="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse"></span>
+                        Connected
+                    </span>
+</div>
+<div class="space-y-2 mb-4">
+<div class="flex justify-between text-xs">
+<span class="text-slate-500">Last Sync:</span>
+<span class="font-medium">2 minutes ago</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-slate-500">Provider:</span>
+<span class="font-medium flex items-center gap-1">Gmail (OAuth 2.0)</span>
+</div>
+</div>
+<button class="w-full bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900/30 text-red-600 hover:bg-red-50 text-xs font-bold py-2 rounded-lg transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">link_off</span>
+                    Disconnect Mailbox
+                </button>
+</div>
+</div>
+</section>
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/10 overflow-hidden">
+<nav class="flex border-b border-primary/10 bg-slate-50 dark:bg-slate-800/50">
+<button class="px-8 py-4 text-sm font-semibold text-primary border-b-2 border-primary bg-white dark:bg-slate-900 flex items-center gap-2">
+<span class="material-icons-outlined text-lg">inbox</span>
+                Inbox
+            </button>
+<button class="px-8 py-4 text-sm font-semibold text-slate-500 hover:text-primary transition-colors flex items-center gap-2 border-b-2 border-transparent">
+<span class="material-icons-outlined text-lg">send</span>
+                Sent
+            </button>
+<button class="px-8 py-4 text-sm font-semibold text-slate-500 hover:text-primary transition-colors flex items-center gap-2 border-b-2 border-transparent">
+<span class="material-icons-outlined text-lg">history</span>
+                Timeline
+            </button>
+<button class="px-8 py-4 text-sm font-semibold text-slate-500 hover:text-primary transition-colors flex items-center gap-2 border-b-2 border-transparent">
+<span class="material-icons-outlined text-lg">folder</span>
+                Documents
+            </button>
+</nav>
+<div class="p-0">
+<div class="px-6 py-4 flex items-center justify-between border-b border-primary/5 bg-white dark:bg-slate-900">
+<div class="flex items-center gap-4 flex-grow max-w-2xl">
+<div class="relative flex-grow">
+<span class="material-icons-outlined absolute left-3 top-2.5 text-slate-400 text-sm">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search emails..." type="text"/>
+</div>
+<div class="relative">
+<select class="appearance-none pl-10 pr-10 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+<option value="">Filter by Application Stage</option>
+<option value="lead">New Leads</option>
+<option value="prospect">Prospecting</option>
+<option value="application">Application Prep</option>
+<option selected="" value="pending">Application Pending</option>
+<option value="visa">Visa Process</option>
+<option value="enrolled">Enrolled</option>
+</select>
+<span class="material-symbols-outlined absolute left-3 top-2 text-slate-400 text-sm pointer-events-none">filter_alt</span>
+<span class="material-icons-outlined absolute right-3 top-2 text-slate-400 text-sm pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Settings">
+<span class="material-icons-outlined">settings</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Refresh">
+<span class="material-icons-outlined">refresh</span>
+</button>
+</div>
+</div>
+<div class="divide-y divide-primary/5">
+<div class="flex items-start gap-4 p-4 px-6 hover:bg-primary/5 cursor-pointer transition-colors group relative border-l-4 border-primary">
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+<span class="text-blue-600 font-bold text-sm">S</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-2">
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">Stanford Admissions Office</h4>
+<span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded uppercase">Application Pending</span>
+</div>
+<span class="text-xs text-primary font-medium">10:45 AM</span>
+</div>
+<h5 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Update on your MSCS Application</h5>
+<p class="text-sm text-slate-500 truncate">Hi Alex, we've received your updated transcript and have moved your file to the review committee...</p>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-slate-400 hover:text-primary"><span class="material-icons-outlined text-sm">reply</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500"><span class="material-icons-outlined text-sm">delete_outline</span></button>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 px-6 hover:bg-primary/5 cursor-pointer transition-colors group relative border-l-4 border-transparent">
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+<span class="text-slate-600 font-bold text-sm">A</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-sm font-medium text-slate-600 dark:text-slate-400">Alex Johnson</h4>
+<span class="text-xs text-slate-400">Yesterday</span>
+</div>
+<h5 class="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">Question about Visa Interview</h5>
+<p class="text-sm text-slate-500 truncate">I was looking at the available slots and had a quick question regarding the documents needed for...</p>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-slate-400 hover:text-primary"><span class="material-icons-outlined text-sm">reply</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500"><span class="material-icons-outlined text-sm">delete_outline</span></button>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 px-6 hover:bg-primary/5 cursor-pointer transition-colors group relative border-l-4 border-transparent">
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+<span class="text-amber-600 font-bold text-sm">D</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-sm font-medium text-slate-600 dark:text-slate-400">Duolingo English Test</h4>
+<span class="text-xs text-slate-400">Oct 24</span>
+</div>
+<h5 class="text-sm font-medium text-slate-800 dark:text-slate-200 mb-1">Your scores are ready!</h5>
+<p class="text-sm text-slate-500 truncate">Congratulations! Your Duolingo English Test results are available. You scored a 145/160...</p>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-slate-400 hover:text-primary"><span class="material-icons-outlined text-sm">reply</span></button>
+<button class="p-1.5 text-slate-400 hover:text-red-500"><span class="material-icons-outlined text-sm">delete_outline</span></button>
+</div>
+</div>
+</div>
+<div class="p-6 text-center border-t border-primary/5 bg-slate-50/50 dark:bg-slate-800/20">
+<p class="text-xs text-slate-400 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">security</span>
+                    End-to-end encrypted connection active for alex.j.edu@gmail.com
+                </p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Upcoming Tasks</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm">Review SOP Final Draft</span>
+<span class="ml-auto text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold">Today</span>
+</div>
+<div class="flex items-center gap-3">
+<input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm">Submit Visa Fee</span>
+<span class="ml-auto text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold">Nov 12</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Application Progress</h3>
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mb-2">
+<div class="bg-primary h-2 rounded-full" style="width: 65%"></div>
+</div>
+<div class="flex justify-between text-xs font-medium">
+<span>65% Complete</span>
+<span class="text-primary">4 of 6 steps</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Contact Info</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3 text-sm">
+<span class="material-icons-outlined text-slate-400">phone</span>
+<span>+1 (555) 123-4567</span>
+</div>
+<div class="flex items-center gap-3 text-sm">
+<span class="material-icons-outlined text-slate-400">schedule</span>
+<span>GMT -5 (New York)</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>
+
+<!-- Compose Email Modal -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex items-center justify-center p-4">
+<div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-0"></div>
+<div class="relative z-10 w-full max-w-2xl bg-white dark:bg-slate-900 shadow-2xl rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col h-[700px]">
+<div class="bg-blue-50/80 dark:bg-blue-900/20 px-6 py-2 border-b border-blue-100 dark:border-blue-800/50 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-blue-600 dark:text-blue-400">verified_user</span>
+<p class="text-[11px] font-medium text-blue-700 dark:text-blue-300">
+                    Sending from <span class="font-bold underline decoration-blue-300">student@gmail.com</span> via OAuth
+                </p>
+</div>
+<div class="flex items-center gap-1.5">
+<img alt="Student Profile" class="w-5 h-5 rounded-full ring-1 ring-white dark:ring-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALjpN3WWZH0dahfKRbSYzX_KSEqi2FnGEDhem0f3RX4XzK8MOjvcuDDfWVSvr8w4jbzPPQQkmPpOBp9FD04lCG8CFivgUXPLEYwsDfkdSafKftCmNeEqDIBd0zUrcPAw7XJqDubTLu1xmRZUUn4fZaeMvlAy7KpiEpICQUx6RZfY8RIOSKyarCetmeVxH4NWjmb4KlqtUdDLoOckWH9obmGdEESO37ZBLW7aQjBHRicXb6vd6mAUK2iT7F6hZ3IABMT4ybZ4WM0xLA"/>
+<span class="text-[10px] text-blue-500 uppercase tracking-wider font-semibold">Active Session</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+<h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100">New Message</h2>
+<div class="flex items-center gap-3">
+<button class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500 transition-colors">
+<span class="material-icons-outlined text-xl">remove</span>
+</button>
+<button class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500 transition-colors">
+<span class="material-icons-outlined text-xl">open_in_full</span>
+</button>
+<button class="p-1.5 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 rounded text-slate-500 transition-colors">
+<span class="material-icons-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<div class="px-6 py-2 border-b border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 py-2 group">
+<span class="text-sm font-medium text-slate-400 w-8">To</span>
+<div class="flex-1 flex flex-wrap gap-2 items-center">
+<div class="bg-primary/10 text-primary text-sm px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-primary/20">
+                        admissions@harvard.edu
+                        <span class="material-icons-outlined text-xs cursor-pointer hover:text-primary/70">close</span>
+</div>
+<input class="flex-1 border-none focus:ring-0 p-0 text-sm bg-transparent dark:text-slate-200" placeholder="" type="text"/>
+</div>
+<button class="text-xs font-medium text-slate-400 hover:text-primary transition-colors">Cc</button>
+<button class="text-xs font-medium text-slate-400 hover:text-primary transition-colors">Bcc</button>
+</div>
+<div class="flex items-center gap-2 py-2 border-t border-slate-50 dark:border-slate-800/50">
+<span class="text-sm font-medium text-slate-400 w-8">Cc</span>
+<input class="flex-1 border-none focus:ring-0 p-0 text-sm bg-transparent dark:text-slate-200" placeholder="Add recipients..." type="text"/>
+</div>
+</div>
+<div class="px-6 py-3 border-b border-slate-100 dark:border-slate-800">
+<input class="w-full border-none focus:ring-0 p-0 text-base font-medium text-slate-800 dark:text-slate-100 bg-transparent placeholder:text-slate-400" placeholder="Subject" type="text"/>
+</div>
+<div class="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-1 border-b border-slate-100 dark:border-slate-800">
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300 transition-shadow">
+<span class="material-icons-outlined text-xl">format_bold</span>
+</button>
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300">
+<span class="material-icons-outlined text-xl">format_italic</span>
+</button>
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300">
+<span class="material-icons-outlined text-xl">format_underlined</span>
+</button>
+<div class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300">
+<span class="material-icons-outlined text-xl">format_list_bulleted</span>
+</button>
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300">
+<span class="material-icons-outlined text-xl">format_list_numbered</span>
+</button>
+<div class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300">
+<span class="material-icons-outlined text-xl">link</span>
+</button>
+<button class="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded text-slate-600 dark:text-slate-300">
+<span class="material-icons-outlined text-xl">insert_emoticon</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar bg-white dark:bg-slate-900">
+<textarea class="w-full h-full border-none focus:ring-0 p-0 text-slate-700 dark:text-slate-300 resize-none bg-transparent placeholder:text-slate-300 leading-relaxed" placeholder="Write your message here..."></textarea>
+</div>
+<div class="px-6 py-2 bg-slate-50/50 dark:bg-slate-800/30 flex flex-wrap gap-2">
+<div class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 shadow-sm">
+<span class="material-icons-outlined text-primary text-sm">description</span>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-300">transcripts_2024.pdf</span>
+<button class="text-slate-400 hover:text-red-500 ml-1 transition-colors">
+<span class="material-icons-outlined text-xs">close</span>
+</button>
+</div>
+</div>
+<div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex items-center">
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-l-lg font-semibold flex items-center gap-2 shadow-md shadow-primary/20 transition-all active:scale-95 border-r border-white/20">
+                        Send
+                        <span class="material-icons-outlined text-sm">send</span>
+</button>
+<button class="bg-primary hover:bg-primary/90 text-white px-3 py-2.5 rounded-r-lg shadow-md shadow-primary/20 transition-all">
+<span class="material-icons-outlined text-sm">keyboard_arrow_down</span>
+</button>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 transition-colors group relative">
+<span class="material-icons-outlined">attach_file</span>
+<span class="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Attach file</span>
+</button>
+<button class="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 transition-colors">
+<span class="material-icons-outlined">image</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="p-2.5 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 rounded-lg text-slate-500 transition-colors flex items-center gap-1.5" title="Discard">
+<span class="material-icons-outlined">delete_outline</span>
+<span class="text-xs font-medium">Discard</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-2 text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined text-[16px]">cloud_done</span>
+<span class="text-xs font-medium">Draft saved at 10:45 AM</span>
+</div>
+</div>
+</div>
+
+</body></html>
