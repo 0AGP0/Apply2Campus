@@ -730,7 +730,7 @@ export function InboxClient({
                           __html: m.bodyHtml ?? `<p>${m.snippet ?? ""}</p>`,
                         }}
                       />
-                      {m.gmailMessageId === selectedId && threadDetail.message.attachments?.length > 0 && (
+                      {m.gmailMessageId === selectedId && (threadDetail.message.attachments?.length ?? 0) > 0 && (
                         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                             <span className="material-icons-outlined text-sm">attach_file</span>
