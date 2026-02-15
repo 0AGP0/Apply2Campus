@@ -23,7 +23,8 @@ export async function GET(
   if (!result) return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
 
   const disposition = `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`;
-  return new NextResponse(result.data, {
+  const body = Buffer.isBuffer(result.data) ? new Uint8Array(result.data) : result.data;
+  return new NextResponse(body, {
     headers: {
       "Content-Disposition": disposition,
       "Content-Type": meta?.mimeType ?? "application/octet-stream",
