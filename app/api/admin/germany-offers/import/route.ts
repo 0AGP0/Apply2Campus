@@ -34,16 +34,20 @@ function parseNum(val: string): number | null {
 
 /** Admin: CSV ile katalog içe aktar. Body = CSV metni (ilk satır başlık). */
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if ((session.user as { role?: string }).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if ((session.user as { role?: string }).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const defaultCountry = req.nextUrl.searchParams.get("defaultCountry") ?? undefined;
-  const raw = await req.text();
-  const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  if (lines.length < 2) {
-    return NextResponse.json({ error: "CSV en az başlık + 1 veri satırı içermeli" }, { status: 400 });
-  }
+    const defaultCountry = req.nextUrl.searchParams.get("defaultCountry") ?? undefined;
+    const raw = await req.text();
+    if (!raw?.trim()) {
+      return NextResponse.json({ error: "CSV metni boş" }, { status: 400 });
+    }
+    const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      return NextResponse.json({ error: "CSV en az başlık + 1 veri satırı içermeli" }, { status: 400 });
+    }
 
   const firstLine = lines[0];
   const delimiter = firstLine.includes("\t") ? "\t" : firstLine.includes(";") ? ";" : ",";
@@ -114,11 +118,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({
-    ok: true,
-    created,
-    updated,
-    total: created + updated,
-    errors: errors.length > 0 ? errors : undefined,
-  });
+    return NextResponse.json({
+      ok: true,
+      created,
+      updated,
+      total: created + updated,
+      errors: errors.length > 0 ? errors : undefined,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "İçe aktarma sırasında hata oluştu";
+    console.error("[germany-offers/import]", err);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
