@@ -226,6 +226,29 @@ export function StudentListClient({
                       </p>
                     </div>
                     <div className="shrink-0 flex flex-col items-end gap-2">
+                      <Link
+                        href={`/students/${s.id}/inbox`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-primary inline-flex"
+                        title="Gelen kutusu"
+                      >
+                        <span className="material-icons-outlined text-lg">inbox</span>
+                      </Link>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!confirm(`"${s.name}" öğrencisini silmek istediğinize emin misiniz?`)) return;
+                            fetch(`/api/students/${s.id}`, { method: "DELETE" }).then((res) => res.ok && fetchStudents());
+                          }}
+                          className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-500 hover:text-red-600 inline-flex"
+                          title="Sil"
+                        >
+                          <span className="material-icons-outlined text-lg">delete</span>
+                        </button>
+                      )}
                       {status === "expired" ? (
                         <a
                           href={`/api/oauth/gmail/start?studentId=${s.id}`}
@@ -235,7 +258,13 @@ export function StudentListClient({
                           Yeniden bağlan
                         </a>
                       ) : (
-                        <span className="material-icons-outlined text-slate-400">chevron_right</span>
+                        <Link
+                          href={`/students/${s.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 inline-flex"
+                        >
+                          <span className="material-icons-outlined text-lg">chevron_right</span>
+                        </Link>
                       )}
                     </div>
                   </div>
@@ -371,21 +400,46 @@ export function StudentListClient({
                         )}
                       </td>
                       <td className="table-td text-right">
-                        {status === "expired" ? (
-                          <a
-                            href={`/api/oauth/gmail/start?studentId=${s.id}`}
-                            className="btn-primary-panel text-xs py-2 px-3"
+                        <div className="flex items-center justify-end gap-1">
+                          <Link
+                            href={`/students/${s.id}/inbox`}
+                            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-primary transition-colors inline-flex"
+                            title="Gelen kutusu"
                           >
-                            Yeniden bağlan
-                          </a>
-                        ) : (
+                            <span className="material-icons-outlined text-lg">inbox</span>
+                          </Link>
                           <Link
                             href={`/students/${s.id}`}
                             className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-primary transition-colors inline-flex"
+                            title="Profili aç"
                           >
                             <span className="material-icons-outlined text-lg">open_in_new</span>
                           </Link>
-                        )}
+                          {status === "expired" && (
+                            <a
+                              href={`/api/oauth/gmail/start?studentId=${s.id}`}
+                              className="btn-primary-panel text-xs py-2 px-3"
+                            >
+                              Yeniden bağlan
+                            </a>
+                          )}
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              onClick={async (ev) => {
+                                ev.preventDefault();
+                                if (!confirm(`"${s.name}" öğrencisini silmek istediğinize emin misiniz? Tüm verileri silinir.`)) return;
+                                const res = await fetch(`/api/students/${s.id}`, { method: "DELETE" });
+                                if (res.ok) fetchStudents();
+                                else alert("Silinemedi.");
+                              }}
+                              className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-500 hover:text-red-600 inline-flex"
+                              title="Öğrenciyi sil"
+                            >
+                              <span className="material-icons-outlined text-lg">delete</span>
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -488,13 +542,17 @@ function AddStudentModal({
 }) {
   const [name, setName] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [password, setPassword] = useState("");
   const defaultStage = stages[0]?.slug ?? "lead";
   const [stage, setStage] = useState(defaultStage);
   const [assignedConsultantId, setAssignedConsultantId] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
     setSaving(true);
     const res = await fetch("/api/students", {
       method: "POST",
@@ -502,20 +560,31 @@ function AddStudentModal({
       body: JSON.stringify({
         name,
         studentEmail: studentEmail || undefined,
+        loginEmail: loginEmail || undefined,
+        password: password || undefined,
         stage,
         assignedConsultantId: assignedConsultantId || undefined,
       }),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
-    if (res.ok) onSaved();
-    else alert("Öğrenci oluşturulamadı");
+    if (res.ok) {
+      onSaved();
+    } else {
+      setError(data.error ?? "Öğrenci oluşturulamadı");
+    }
   }
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="panel-card-inner w-full max-w-md p-6 shadow-2xl">
+      <div className="panel-card-inner w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-5">Öğrenci ekle</h2>
         <form onSubmit={submit} className="space-y-5">
+          {error && (
+            <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">
+              {error}
+            </p>
+          )}
           <div>
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
               Ad *
@@ -529,7 +598,7 @@ function AddStudentModal({
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              E-posta (isteğe bağlı)
+              E-posta (iletişim, isteğe bağlı)
             </label>
             <input
               type="email"
@@ -537,6 +606,32 @@ function AddStudentModal({
               onChange={(e) => setStudentEmail(e.target.value)}
               className="input-panel"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              Giriş e-postası (portal şifresi belirlemek için)
+            </label>
+            <input
+              type="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              className="input-panel"
+              placeholder="Şifre verilecekse gerekli"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              Portal şifresi (isteğe bağlı)
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-panel"
+              placeholder="En az 8 karakter"
+              minLength={8}
+            />
+            <p className="text-xs text-slate-500 mt-1">Belirlenirse öğrenci bu e-posta ve şifre ile giriş yapabilir.</p>
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">

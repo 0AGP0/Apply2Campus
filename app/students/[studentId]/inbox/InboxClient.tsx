@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ComposeModal } from "@/components/ComposeModal";
 import { PageHeader } from "@/components/PageHeader";
+import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -727,7 +728,7 @@ export function InboxClient({
                       <div
                         className="prose prose-slate dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300"
                         dangerouslySetInnerHTML={{
-                          __html: m.bodyHtml ?? `<p>${m.snippet ?? ""}</p>`,
+                          __html: safeEmailBodyHtml(m.bodyHtml, m.snippet),
                         }}
                       />
                       {m.gmailMessageId === selectedId && (threadDetail.message.attachments?.length ?? 0) > 0 && (

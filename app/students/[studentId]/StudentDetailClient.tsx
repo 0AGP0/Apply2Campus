@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { InfoCard } from "@/components/InfoCard";
+import { CrmCardClient } from "./CrmCardClient";
+import { StudentOffersSection } from "./StudentOffersSection";
 
 type StageItem = { slug: string; name: string };
 
@@ -146,6 +148,10 @@ export function StudentDetailClient({
           </div>
         </div>
       </section>
+
+      <CrmCardClient studentId={student.id} editable />
+
+      <StudentOffersSection studentId={student.id} />
 
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/10 overflow-hidden">
         <nav className="flex border-b border-primary/10 bg-slate-50 dark:bg-slate-800/50 overflow-x-auto">

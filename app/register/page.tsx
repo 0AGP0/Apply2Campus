@@ -104,8 +104,8 @@ function RegisterForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              placeholder="En az 6 karakter"
-              minLength={6}
+              placeholder="En az 8 karakter"
+              minLength={8}
               required
             />
           </div>

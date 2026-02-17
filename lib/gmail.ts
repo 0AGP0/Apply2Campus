@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { decrypt, encrypt } from "./encryption";
+import { safeEmailHeaderValue } from "./sanitize";
 import { prisma } from "./db";
 import type { GmailConnection } from "@prisma/client";
 
@@ -179,6 +180,12 @@ export async function sendEmailAsStudent(
     (a) => a?.name && a?.contentBase64
   ) ?? [];
 
+  const safeTo = safeEmailHeaderValue(to);
+  const safeSubject = safeEmailHeaderValue(subject);
+  const safeCc = safeEmailHeaderValue(options?.cc);
+  const safeBcc = safeEmailHeaderValue(options?.bcc);
+  if (!safeTo || !safeSubject) throw new Error("to and subject required");
+
   let raw: string;
 
   if (attachments.length === 0) {
@@ -186,25 +193,25 @@ export async function sendEmailAsStudent(
     const bodyBase64 = Buffer.from(bodyContent, "utf-8").toString("base64");
     const bodyBase64Lines = bodyBase64.match(/.{1,76}/g) ?? [];
     const headerLines = [
-      `To: ${to}`,
-      options?.cc ? `Cc: ${options.cc}` : "",
-      options?.bcc ? `Bcc: ${options.bcc}` : "",
+      `To: ${safeTo}`,
+      safeCc ? `Cc: ${safeCc}` : "",
+      safeBcc ? `Bcc: ${safeBcc}` : "",
       "Content-Type: text/html; charset=utf-8",
       "Content-Transfer-Encoding: base64",
       "MIME-Version: 1.0",
-      `Subject: ${subject}`,
+      `Subject: ${safeSubject}`,
     ].filter(Boolean);
     raw = headerLines.join("\r\n") + "\r\n\r\n" + bodyBase64Lines.join("\r\n") + "\r\n";
   } else {
     // Multipart: gövde + ekler
     const boundary = "----=_Part_" + Date.now() + "_" + Math.random().toString(36).slice(2);
     const headerLines = [
-      `To: ${to}`,
-      options?.cc ? `Cc: ${options.cc}` : "",
-      options?.bcc ? `Bcc: ${options.bcc}` : "",
+      `To: ${safeTo}`,
+      safeCc ? `Cc: ${safeCc}` : "",
+      safeBcc ? `Bcc: ${safeBcc}` : "",
       "MIME-Version: 1.0",
       `Content-Type: multipart/mixed; boundary="${boundary}"`,
-      `Subject: ${subject}`,
+      `Subject: ${safeSubject}`,
     ].filter(Boolean);
     const parts: string[] = [];
     // Parça 1: HTML gövde

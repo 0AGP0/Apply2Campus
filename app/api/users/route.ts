@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { validatePassword } from "@/lib/password";
 import bcrypt from "bcryptjs";
 
 export async function GET() {
@@ -42,20 +43,35 @@ export async function POST(req: NextRequest) {
   const assignRole = newRole === "ADMIN" ? "ADMIN" : "CONSULTANT";
   if (!email || typeof email !== "string") return NextResponse.json({ error: "Email required" }, { status: 400 });
   const trimmedEmail = email.trim().toLowerCase();
-  if (assignRole === "CONSULTANT" && (!password || (password as string).length < 6))
-    return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+  if (assignRole === "CONSULTANT" && password) {
+    const pwdCheck = validatePassword(password);
+    if (!pwdCheck.ok) return NextResponse.json({ error: pwdCheck.error }, { status: 400 });
+  }
+  if (assignRole === "CONSULTANT" && !password)
+    return NextResponse.json({ error: "Danışman için şifre gerekli" }, { status: 400 });
 
   const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
   if (existing) return NextResponse.json({ error: "Email already registered" }, { status: 400 });
 
-  const passwordHash = password ? await bcrypt.hash(String(password), 10) : null;
-  const user = await prisma.user.create({
-    data: {
-      email: trimmedEmail,
-      name: (name ?? trimmedEmail).toString().trim() || null,
-      passwordHash,
-      role: assignRole,
-    },
-  });
-  return NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role }, { status: 201 });
+  const rawName = (name ?? trimmedEmail).toString().trim() || null;
+  const safeName = rawName ? rawName.slice(0, 200) : null;
+
+  try {
+    const passwordHash = password ? await bcrypt.hash(String(password), 10) : null;
+    const user = await prisma.user.create({
+      data: {
+        email: trimmedEmail,
+        name: safeName,
+        passwordHash,
+        role: assignRole,
+      },
+    });
+    return NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role }, { status: 201 });
+  } catch (e) {
+    console.error("User create error:", e);
+    return NextResponse.json(
+      { error: "Kullanıcı oluşturulamadı. Lütfen tekrar deneyin." },
+      { status: 500 }
+    );
+  }
 }

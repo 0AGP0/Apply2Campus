@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { getAuthUrl } from "@/lib/gmail";
+import { signOAuthState } from "@/lib/oauth-state";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest) {
     if (!ok) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const url = getAuthUrl(studentId);
+  const state = signOAuthState(studentId);
+  const url = getAuthUrl(state);
   return NextResponse.redirect(url);
 }

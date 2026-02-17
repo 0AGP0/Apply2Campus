@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { getAttachment, getMessageAttachments } from "@/lib/gmail";
+import { safeFilename } from "@/lib/sanitize";
 
 export async function GET(
   req: NextRequest,
@@ -17,7 +18,8 @@ export async function GET(
 
   const metaList = await getMessageAttachments(studentId, messageId).catch(() => []);
   const meta = metaList.find((a) => a.attachmentId === attachmentId);
-  const filename = meta?.filename ?? req.nextUrl.searchParams.get("filename") ?? "ek";
+  const rawFilename = meta?.filename ?? req.nextUrl.searchParams.get("filename") ?? "ek";
+  const filename = safeFilename(rawFilename, "ek");
 
   const result = await getAttachment(studentId, messageId, attachmentId);
   if (!result) return NextResponse.json({ error: "Attachment not found" }, { status: 404 });

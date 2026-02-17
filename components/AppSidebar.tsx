@@ -122,6 +122,13 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
               active={pathname === "/admin/asamalar"}
               onNavigate={onNavigate}
             />
+            <NavLink
+              href="/admin/katalog"
+              label="Katalog"
+              icon="menu_book"
+              active={pathname === "/admin/katalog"}
+              onNavigate={onNavigate}
+            />
           </>
         ) : (
           <NavLink

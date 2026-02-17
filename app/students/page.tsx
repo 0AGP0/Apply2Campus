@@ -2,6 +2,7 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { StudentListClient } from "./StudentListClient";
 import { PageHeader } from "@/components/PageHeader";
 import { InfoCard } from "@/components/InfoCard";
+import { ConsultantNotifications } from "@/components/ConsultantNotifications";
 
 export default async function StudentsPage() {
   const session = await getServerSession(authOptions);
@@ -22,7 +23,9 @@ export default async function StudentsPage() {
               <span className="material-icons-outlined text-lg">dashboard</span>
               Admin paneli
             </a>
-          ) : undefined
+          ) : (
+            <ConsultantNotifications />
+          )
         }
       />
 

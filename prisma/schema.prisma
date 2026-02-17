@@ -32,11 +32,13 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  student           Student?       @relation("StudentLogin", fields: [studentId], references: [id], onDelete: Cascade)
-  assignedStudents  Student[]      @relation("AssignedConsultant")
-  auditLogs         AuditLog[]     @relation("ActorUser")
-  accounts          Account[]
-  sessions          Session[]
+  student               Student?                @relation("StudentLogin", fields: [studentId], references: [id], onDelete: Cascade)
+  assignedStudents      Student[]               @relation("AssignedConsultant")
+  auditLogs             AuditLog[]              @relation("ActorUser")
+  consultantNotifications ConsultantNotification[]
+  createdOffers          Offer[]
+  accounts              Account[]
+  sessions              Session[]
 }
 
 model Account {
@@ -96,16 +98,94 @@ model Student {
   updatedAt             DateTime  @updatedAt
 
   studentLogin    User?              @relation("StudentLogin")
-  consultant      User?              @relation("AssignedConsultant", fields: [assignedConsultantId], references: [id], onDelete: SetNull)
+  consultant      User?                     @relation("AssignedConsultant", fields: [assignedConsultantId], references: [id], onDelete: SetNull)
   gmailConnection GmailConnection?
   emailMessages   EmailMessage[]
   emailThreads    EmailThread[]
   auditLogs       AuditLog[]
+  consultantNotifications ConsultantNotification[]
   folders         Folder[]
+  crmValues       CrmValue[]
+  documents       StudentDocument[]
+  offers          Offer[]
 
   @@index([assignedConsultantId])
   @@index([stage])
   @@index([gmailAddress])
+}
+
+// CRM: Form bölümleri (Kişisel, Aile, Pasaport, Eğitim, Belgeler) — admin'den düzenlenebilir
+model CrmSection {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  fields CrmField[]
+}
+
+enum CrmFieldType {
+  TEXT
+  EMAIL
+  TEL
+  TEXTAREA
+  DATE
+  RADIO
+  SELECT
+  CHECKBOX
+  FILE
+}
+
+// CRM: Admin'in ekleyip düzenleyebildiği form alanları
+model CrmField {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  label          String
+  type           CrmFieldType
+  options        Json?
+  required       Boolean      @default(false)
+  sortOrder      Int          @default(0)
+  allowMultiple  Boolean      @default(false)
+  sectionId      String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  section          CrmSection?       @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  crmValues        CrmValue[]
+  studentDocuments StudentDocument[]
+}
+
+model CrmValue {
+  id         String   @id @default(cuid())
+  studentId  String
+  crmFieldId String
+  value      String   @db.Text
+  updatedAt  DateTime @updatedAt
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  crmField CrmField @relation(fields: [crmFieldId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, crmFieldId])
+  @@index([studentId])
+  @@index([crmFieldId])
+}
+
+model StudentDocument {
+  id         String   @id @default(cuid())
+  studentId  String
+  crmFieldId String
+  fileName   String
+  filePath   String
+  mimeType   String?
+  fileSize   Int?
+  uploadedAt DateTime @default(now())
+
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  crmField CrmField @relation(fields: [crmFieldId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([studentId, crmFieldId])
 }
 
 model Badge {
@@ -211,4 +291,79 @@ model AuditLog {
   @@index([actorUserId])
   @@index([studentId])
   @@index([createdAt])
+}
+
+// Danışmana giden bildirimler: yeni öğrenci atandı / öğrenci bilgisi güncellendi
+model ConsultantNotification {
+  id         String    @id @default(cuid())
+  userId     String    // danışman
+  type       String    // STUDENT_ASSIGNED | STUDENT_UPDATED
+  studentId  String
+  message    String?   @db.Text
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, readAt])
+}
+
+// Teklif kataloğu – ürün/attribute yapısı (ülke + şehir, okul, program + süre fiyatları)
+// attributes: { "2": 1500, "8": 4000, "currency": "EUR", ... }
+model CatalogItem {
+  id         String   @id @default(cuid())
+  country    String   // Ülke (CSV Ulke veya import sırasında seçilen)
+  city       String   // Şehir
+  schoolName String   // Okul Adı
+  program    String   // Program
+  attributes Json?    // Süre fiyatları + para birimi + isteğe bağlı alanlar
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([country])
+  @@index([country, city])
+  @@index([country, city, schoolName])
+}
+
+// Öğrenciye gönderilen teklif
+model Offer {
+  id           String    @id @default(cuid())
+  studentId    String
+  createdById  String    // danışman/admin
+  title        String
+  summary      String?   @db.Text
+  body         String?   @db.Text
+  status       String    @default("DRAFT") // DRAFT | SENT | VIEWED | ACCEPTED | REJECTED | REVISION_REQUESTED
+  sentAt       DateTime?
+  viewedAt     DateTime?
+  respondedAt  DateTime?
+  responseNote String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdBy  User       @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  items      OfferItem[]
+  @@index([studentId])
+  @@index([createdById])
+  @@index([status])
+}
+
+// Teklif kalemi (gönderilirken katalogdan kopyalanan anlık veri)
+model OfferItem {
+  id            String   @id @default(cuid())
+  offerId       String
+  city          String
+  schoolName    String   // Okul Adı
+  program       String
+  programGroup  String?  // Program_Grup: Eğitim, Konaklama, Diğer vb.
+  durationWeeks Int      // 2, 8, 12, 16, 24, 32
+  amount        Decimal  @db.Decimal(12, 2)
+  currency      String?  // EUR, USD, ...
+  sortOrder     Int      @default(0)
+
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  @@index([offerId])
 }

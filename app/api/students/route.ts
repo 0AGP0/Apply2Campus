@@ -1,8 +1,10 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { getStudentsForUser } from "@/lib/rbac";
 import { prisma } from "@/lib/db";
+import { createConsultantNotification } from "@/lib/notifications";
+import { validatePassword } from "@/lib/password";
+import bcrypt from "bcryptjs";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -59,13 +61,22 @@ export async function POST(req: NextRequest) {
   if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
-  const { name, studentEmail, gmailAddress, stage, assignedConsultantId } = body;
+  const { name, studentEmail, gmailAddress, stage, assignedConsultantId, password, loginEmail } = body;
   if (!name) return NextResponse.json({ error: "Name required" }, { status: 400 });
 
   const stageSlug = stage ?? "lead";
   const stages = await prisma.stage.findMany({ select: { slug: true } });
   const validSlugs = stages.map((s) => s.slug);
   const finalStage = validSlugs.includes(stageSlug) ? stageSlug : validSlugs[0] ?? "lead";
+
+  const emailForLogin = (loginEmail ?? studentEmail ?? "").toString().trim().toLowerCase();
+  if (password) {
+    const pwdCheck = validatePassword(password);
+    if (!pwdCheck.ok) return NextResponse.json({ error: pwdCheck.error }, { status: 400 });
+    if (!emailForLogin) return NextResponse.json({ error: "Şifre belirlemek için giriş e-postası (veya e-posta) gerekli" }, { status: 400 });
+    const existing = await prisma.user.findUnique({ where: { email: emailForLogin } });
+    if (existing) return NextResponse.json({ error: "Bu e-posta adresi zaten kayıtlı" }, { status: 400 });
+  }
 
   const student = await prisma.student.create({
     data: {
@@ -76,5 +87,29 @@ export async function POST(req: NextRequest) {
       assignedConsultantId: assignedConsultantId ?? null,
     },
   });
+
+  if (password && emailForLogin) {
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.user.create({
+      data: {
+        email: emailForLogin,
+        name: student.name,
+        passwordHash,
+        role: "STUDENT",
+        studentId: student.id,
+      },
+    });
+  }
+
+  const consultantId = student.assignedConsultantId;
+  if (consultantId) {
+    await createConsultantNotification(
+      consultantId,
+      "STUDENT_ASSIGNED",
+      student.id,
+      `Yeni öğrenci atandı: ${student.name}`
+    ).catch(() => {});
+  }
+
   return NextResponse.json(student);
 }

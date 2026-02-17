@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { StudentComposeModal } from "../StudentComposeModal";
+import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 type EmailMessage = {
   id: string;
@@ -265,7 +266,7 @@ export function StudentInboxClient({
                       </div>
                       <div
                         className="prose prose-slate dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300"
-                        dangerouslySetInnerHTML={{ __html: m.bodyHtml ?? `<p>${m.snippet ?? ""}</p>` }}
+                        dangerouslySetInnerHTML={{ __html: safeEmailBodyHtml(m.bodyHtml, m.snippet) }}
                       />
                     </div>
                   ))}

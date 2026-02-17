@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ComposeModal } from "@/components/ComposeModal";
+import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 type AttachmentMeta = {
   filename: string;
@@ -140,7 +141,7 @@ export function EmailDetailClient({
                 <div
                   className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
                   dangerouslySetInnerHTML={{
-                    __html: m.bodyHtml ?? `<p>${m.snippet ?? ""}</p>`,
+                    __html: safeEmailBodyHtml(m.bodyHtml, m.snippet),
                   }}
                 />
                 {m.id === message.id && (message.attachments?.length ?? 0) > 0 && (

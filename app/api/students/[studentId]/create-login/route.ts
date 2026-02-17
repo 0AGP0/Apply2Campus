@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { prisma } from "@/lib/db";
+import { validatePassword } from "@/lib/password";
 import bcrypt from "bcryptjs";
 
 /**
@@ -27,19 +28,29 @@ export async function POST(
   const body = await req.json();
   const { email, password } = body;
   if (!email || !password) return NextResponse.json({ error: "email ve password gerekli" }, { status: 400 });
+  const pwdCheck = validatePassword(password);
+  if (!pwdCheck.ok) return NextResponse.json({ error: pwdCheck.error }, { status: 400 });
 
   const existing = await prisma.user.findUnique({ where: { email: String(email).trim() } });
   if (existing) return NextResponse.json({ error: "Bu email ile kayıtlı kullanıcı zaten var" }, { status: 400 });
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({
-    data: {
-      email: String(email).trim(),
-      name: student.name,
-      passwordHash,
-      role: "STUDENT",
-      studentId: student.id,
-    },
-  });
-  return NextResponse.json({ ok: true, message: "Öğrenci giriş hesabı oluşturuldu" });
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.user.create({
+      data: {
+        email: String(email).trim(),
+        name: student.name,
+        passwordHash,
+        role: "STUDENT",
+        studentId: student.id,
+      },
+    });
+    return NextResponse.json({ ok: true, message: "Öğrenci giriş hesabı oluşturuldu" });
+  } catch (e) {
+    console.error("Create login error:", e);
+    return NextResponse.json(
+      { error: "Hesap oluşturulurken bir hata oluştu. Lütfen tekrar deneyin." },
+      { status: 500 }
+    );
+  }
 }

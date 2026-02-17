@@ -21,16 +21,6 @@ type Consultant = {
   auditLogs?: { createdAt: string; message: string | null }[];
 };
 
-type AuditLog = {
-  id: string;
-  type: string;
-  message: string | null;
-  level: string;
-  createdAt: string;
-  actor: { name: string | null; email: string | null };
-  student: { name: string; id: string } | null;
-};
-
 const STAT_CARDS = [
   {
     key: "totalStudents" as const,
@@ -67,8 +57,6 @@ const STAT_CARDS = [
 export function AdminOverviewClient() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [consultants, setConsultants] = useState<Consultant[]>([]);
-  const [logs, setLogs] = useState<AuditLog[]>([]);
-  const [logsLoading, setLogsLoading] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/stats")
@@ -82,14 +70,6 @@ export function AdminOverviewClient() {
       .then((r) => r.json())
       .then((data) => setConsultants(data.consultants ?? []))
       .catch(() => setConsultants([]));
-  }, []);
-
-  useEffect(() => {
-    setLogsLoading(true);
-    fetch("/api/admin/audit-logs?page=1&pageSize=25")
-      .then((r) => r.json())
-      .then((data) => setLogs(data.logs ?? []))
-      .finally(() => setLogsLoading(false));
   }, []);
 
   function formatAgo(dateStr: string) {
@@ -263,74 +243,6 @@ export function AdminOverviewClient() {
                   )}
                 </tbody>
               </table>
-            </div>
-          </section>
-
-          <section className="space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pl-4 border-l-4 border-primary">
-              <h2 className="panel-section-title">Son etkinlikler</h2>
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-medium border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
-                  <span className="material-icons-outlined text-[14px]">filter_list</span>
-                  Filtrele
-                </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-medium border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
-                  <span className="material-icons-outlined text-[14px]">sort</span>
-                  Sırala
-                </button>
-              </div>
-            </div>
-            <div className="panel-card">
-              {logsLoading ? (
-                <div className="px-8 py-16 text-center text-slate-500 text-sm bg-slate-50/50 dark:bg-slate-800/20 rounded-2xl m-4">
-                  Yükleniyor…
-                </div>
-              ) : logs.length === 0 ? (
-                <div className="px-8 py-16 text-center text-slate-500 text-sm bg-slate-50/50 dark:bg-slate-800/20 rounded-2xl m-4">
-                  Henüz etkinlik kaydı yok. İşlemler burada listelenecek.
-                </div>
-              ) : (
-                <ul className="divide-y divide-slate-200/80 dark:divide-slate-700/80">
-                  {logs.map((log, i) => (
-                    <li
-                      key={log.id}
-                      className={`px-6 py-4 flex items-center gap-4 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40 ${i % 2 === 1 ? "bg-slate-50/50 dark:bg-slate-800/20" : ""}`}
-                    >
-                      <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs shrink-0">
-                        {initials(log.actor?.name ?? log.actor?.email)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-slate-900 dark:text-white">
-                          {log.actor?.name ?? log.actor?.email ?? "—"}
-                          {log.student && (
-                            <span className="text-slate-500 font-normal">
-                              {" "}
-                              · {log.student.name}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-sm text-slate-500 truncate mt-0.5">
-                          {log.message ?? log.type}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span
-                          className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg ${
-                            log.level === "error" || log.level === "critical"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                              : "bg-slate-200/80 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                          }`}
-                        >
-                          {log.level}
-                        </span>
-                        <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
-                          {formatAgo(log.createdAt)}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
           </section>
         </div>

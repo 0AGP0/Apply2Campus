@@ -44,6 +44,7 @@ export function AdminConsultantsClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   function fetchConsultants() {
     fetch("/api/users")
@@ -86,6 +87,22 @@ export function AdminConsultantsClient() {
       ),
     [consultants]
   );
+
+  async function handleDeleteConsultant(c: Consultant) {
+    const count = c._count?.assignedStudents ?? c.assignedStudents?.length ?? 0;
+    const msg = count > 0
+      ? `"${c.name ?? c.email}" danışmanını silmek istediğinize emin misiniz? Atanan ${count} öğrencinin danışman ataması kaldırılacak.`
+      : `"${c.name ?? c.email}" danışmanını silmek istediğinize emin misiniz?`;
+    if (!confirm(msg)) return;
+    setDeletingId(c.id);
+    const res = await fetch(`/api/users/${c.id}`, { method: "DELETE" });
+    setDeletingId(null);
+    if (res.ok) fetchConsultants();
+    else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error ?? "Silinemedi");
+    }
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -233,30 +250,43 @@ export function AdminConsultantsClient() {
                 const displayName = c.name ?? c.email ?? "—";
                 const lastLog = c.auditLogs?.[0];
                 return (
-                  <Link
+                  <div
                     key={c.id}
-                    href={`/admin/ogrenciler?consultantId=${c.id}`}
-                    className="panel-card p-4 flex items-center gap-4 block active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors"
+                    className="panel-card p-4 flex items-center gap-4"
                   >
-                    <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-                      {initials(displayName)}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-900 dark:text-white truncate">
-                        {displayName}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                        {c.email}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1.5">
-                        {lastLog ? formatAgo(lastLog.createdAt) : "—"}
-                      </p>
-                    </div>
-                    <div className="shrink-0 flex items-center gap-1 text-primary font-semibold text-sm">
-                      <span className="tabular-nums">{count} öğrenci</span>
-                      <span className="material-icons-outlined text-lg">chevron_right</span>
-                    </div>
-                  </Link>
+                    <Link
+                      href={`/admin/ogrenciler?consultantId=${c.id}`}
+                      className="flex items-center gap-4 flex-1 min-w-0 active:opacity-90"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
+                        {initials(displayName)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-slate-900 dark:text-white truncate">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          {c.email}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-1.5">
+                          {lastLog ? formatAgo(lastLog.createdAt) : "—"}
+                        </p>
+                      </div>
+                      <div className="shrink-0 flex items-center gap-1 text-primary font-semibold text-sm">
+                        <span className="tabular-nums">{count} öğrenci</span>
+                        <span className="material-icons-outlined text-lg">chevron_right</span>
+                      </div>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteConsultant(c)}
+                      disabled={deletingId === c.id}
+                      className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-500 hover:text-red-600 shrink-0"
+                      title="Danışmanı sil"
+                    >
+                      <span className="material-icons-outlined text-lg">delete</span>
+                    </button>
+                  </div>
                 );
               })
             )}
@@ -327,13 +357,24 @@ export function AdminConsultantsClient() {
                           )}
                         </td>
                         <td className="table-td text-right">
-                          <Link
-                            href={`/admin/ogrenciler?consultantId=${c.id}`}
-                            className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                          >
-                            Öğrenciler
-                            <span className="material-icons-outlined text-base">arrow_forward</span>
-                          </Link>
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/admin/ogrenciler?consultantId=${c.id}`}
+                              className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                            >
+                              Öğrenciler
+                              <span className="material-icons-outlined text-base">arrow_forward</span>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteConsultant(c)}
+                              disabled={deletingId === c.id}
+                              className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-500 hover:text-red-600 disabled:opacity-50"
+                              title="Danışmanı sil"
+                            >
+                              <span className="material-icons-outlined text-lg">delete</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

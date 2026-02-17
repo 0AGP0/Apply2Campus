@@ -31,7 +31,7 @@ export function StudentDashboardLayout({
   const NavContent = () => (
     <>
       <div className="p-4 lg:p-6">
-        <Link href="/dashboard/inbox" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
+        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2">
           <div className="bg-primary p-1.5 rounded-lg">
             <span className="material-icons-outlined text-white text-xl">school</span>
           </div>
@@ -44,9 +44,13 @@ export function StudentDashboardLayout({
         </p>
       </div>
       <nav className="flex-1 px-4 space-y-1">
-        <Link href="/dashboard/inbox" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname.startsWith("/dashboard/inbox") ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
-          <span className="material-icons-outlined text-xl">inbox</span>
-          <span className="font-medium text-sm">Gelen Kutusu</span>
+        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">home</span>
+          <span className="font-medium text-sm">Ana Sayfa</span>
+        </Link>
+        <Link href="/dashboard/offers" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname?.startsWith("/dashboard/offers") ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">description</span>
+          <span className="font-medium text-sm">Teklifler</span>
         </Link>
         <Link href="/dashboard/settings" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/settings" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
           <span className="material-icons-outlined text-xl">settings</span>
@@ -75,9 +79,9 @@ export function StudentDashboardLayout({
   );
 
   return (
-    <div className="flex min-h-screen bg-background-light dark:bg-background-dark font-display">
+    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark font-display">
       <SignOutModal open={signOutOpen} onClose={() => setSignOutOpen(false)} />
-      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hidden lg:flex flex-col shrink-0">
+      <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:h-screen lg:overflow-y-auto bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
         <NavContent />
       </aside>
 
@@ -85,7 +89,7 @@ export function StudentDashboardLayout({
         <button type="button" onClick={() => setMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" aria-label="Menüyü aç">
           <span className="material-icons-outlined text-2xl">menu</span>
         </button>
-        <Link href="/dashboard/inbox" className="flex items-center gap-2 min-w-0">
+        <Link href="/dashboard" className="flex items-center gap-2 min-w-0">
           <div className="bg-primary p-1 rounded-lg shrink-0">
             <span className="material-icons-outlined text-white text-lg">school</span>
           </div>
@@ -113,7 +117,7 @@ export function StudentDashboardLayout({
         </>
       )}
 
-      <main className="flex-1 min-h-0 flex flex-col min-w-0 overflow-y-auto pt-14 lg:pt-0">
+      <main className="flex-1 min-h-0 min-w-0 flex flex-col overflow-y-auto pt-14 lg:pt-0">
         {children}
       </main>
     </div>

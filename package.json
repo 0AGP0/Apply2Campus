@@ -22,7 +22,8 @@
     "next": "14.2.18",
     "next-auth": "^4.24.10",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.9",
@@ -38,5 +39,8 @@
     "tailwindcss": "^3.4.15",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

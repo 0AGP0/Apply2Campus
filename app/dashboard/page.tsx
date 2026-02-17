@@ -2,6 +2,7 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { GmailConnectionCard } from "./GmailConnectionCard";
+import { StudentDashboardPanel } from "./StudentDashboardPanel";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -9,26 +10,48 @@ export default async function DashboardPage() {
   const studentId = (session.user as { studentId?: string }).studentId;
   if (!studentId) redirect("/login");
 
-  const student = await prisma.student.findUnique({
-    where: { id: studentId },
-    include: { gmailConnection: { select: { status: true, lastSyncAt: true } } },
-  });
+  const [student, stages] = await Promise.all([
+    prisma.student.findUnique({
+      where: { id: studentId },
+      include: { gmailConnection: { select: { status: true, lastSyncAt: true } } },
+    }),
+    prisma.stage.findMany({
+      orderBy: { sortOrder: "asc" },
+      select: { slug: true, name: true, sortOrder: true },
+    }),
+  ]);
   if (!student) redirect("/login");
 
   const status = student.gmailConnection?.status ?? "disconnected";
+  const gmailConnected = status === "connected";
 
-  if (status === "connected") {
-    redirect("/dashboard/inbox");
+  if (gmailConnected) {
+    return (
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <StudentDashboardPanel
+          studentId={student.id}
+          currentStageSlug={student.stage}
+          stages={stages}
+          gmailConnected={true}
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
-      <div className="max-w-2xl mx-auto pt-4 sm:pt-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-2xl">
+        <div className="mb-6 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50">
+          <p className="text-sm text-amber-800 dark:text-amber-200 flex items-center gap-2">
+            <span className="material-icons-outlined">info</span>
+            <strong>Yapman gereken:</strong> Önce aşağıdan Gmail hesabını bağla. Ardından başvuru kartını doldurman gerekecek.
+          </p>
+        </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
           Gmail hesabını bağla
         </h1>
         <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base mb-6">
-          Danışmanınla maillerini tek yerden takip edebilmen için Gmail hesabını güvenli bir şekilde bağlaman gerekiyor. Bu sayede gelen kutundaki mailleri burada görebilir ve yanıtlayabilirsin.
+          Danışmanınla süreçlerini yürütebilmesi için Gmail hesabını güvenli bir şekilde bağlaman gerekiyor. Bağlantıyı <strong>Ayarlar</strong> sayfasından da yapabilirsin.
         </p>
 
         {/* Öğretici: Ne yapacaksın */}
@@ -52,7 +75,7 @@ export default async function DashboardPage() {
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-xs">4</span>
-              <span>Yönlendirildikten sonra gelen kutusu burada açılacak; danışmanın da senin izin verdiğin mailleri görebilecek.</span>
+              <span>Bağlantı tamamlandıktan sonra danışmanın seninle ilgili süreçleri yürütebilmesi için gerekli erişim sağlanmış olur.</span>
             </li>
           </ol>
         </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getOAuth2Client } from "@/lib/gmail";
 import { prisma } from "@/lib/db";
 import { encrypt } from "@/lib/encryption";
+import { verifyOAuthState } from "@/lib/oauth-state";
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
@@ -16,7 +17,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${baseUrl}/students?error=missing_params`);
   }
 
-  const studentId = state;
+  const studentId = verifyOAuthState(state);
+  if (!studentId) {
+    return NextResponse.redirect(`${baseUrl}/students?error=invalid_state`);
+  }
   const student = await prisma.student.findUnique({ where: { id: studentId } });
   if (!student) {
     return NextResponse.redirect(`${baseUrl}/students?error=student_not_found`);

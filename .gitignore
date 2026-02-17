@@ -46,6 +46,9 @@ prisma/*.db-journal
 coverage/
 .nyc_output/
 
+# Uploads (CRM belgeleri - VPS'te oluşur)
+data/uploads/
+
 # Misc
 *.pem
 .git_commit_msg.txt

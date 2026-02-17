@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { prisma } from "@/lib/db";
+import { createConsultantNotification } from "@/lib/notifications";
 
 export async function GET(
   _req: NextRequest,
@@ -83,9 +84,57 @@ export async function PATCH(
         : {};
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "No valid update" }, { status: 400 });
 
+  const previous = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: { assignedConsultantId: true, name: true },
+  });
   const student = await prisma.student.update({
     where: { id: studentId },
     data,
   });
+
+  if (isAdmin) {
+    const newConsultantId = student.assignedConsultantId ?? null;
+    const prevConsultantId = previous?.assignedConsultantId ?? null;
+    if (newConsultantId && newConsultantId !== prevConsultantId) {
+      await createConsultantNotification(
+        newConsultantId,
+        "STUDENT_ASSIGNED",
+        student.id,
+        `Yeni öğrenci atandı: ${student.name}`
+      ).catch(() => {});
+    } else if (
+      newConsultantId &&
+      (data.name !== undefined || data.studentEmail !== undefined || data.gmailAddress !== undefined || data.stage !== undefined)
+    ) {
+      await createConsultantNotification(
+        newConsultantId,
+        "STUDENT_UPDATED",
+        student.id,
+        `Öğrenci bilgisi güncellendi: ${student.name}`
+      ).catch(() => {});
+    }
+  }
+
   return NextResponse.json(student);
+}
+
+/** Admin: Öğrenciyi siler (giriş hesabı varsa o da silinir). */
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ studentId: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const role = (session.user as { role?: string }).role ?? "CONSULTANT";
+  if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { studentId } = await params;
+
+  const student = await prisma.student.findUnique({ where: { id: studentId } });
+  if (!student) return NextResponse.json({ error: "Öğrenci bulunamadı" }, { status: 404 });
+
+  await prisma.student.delete({ where: { id: studentId } });
+
+  return NextResponse.json({ ok: true });
 }

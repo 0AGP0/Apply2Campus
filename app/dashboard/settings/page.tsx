@@ -12,16 +12,20 @@ export default async function SettingsPage() {
 
   const student = await prisma.student.findUnique({
     where: { id: studentId },
-    include: { gmailConnection: { select: { status: true, lastSyncAt: true } } },
+    include: {
+      gmailConnection: { select: { status: true, lastSyncAt: true } },
+      studentLogin: { select: { email: true } },
+    },
   });
   if (!student) redirect("/login");
+  const loginEmail = student.studentLogin?.email ?? null;
 
   const conn = student.gmailConnection;
   const status = conn?.status ?? "disconnected";
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
         Ayarlar
       </h1>
       <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">
@@ -34,18 +38,20 @@ export default async function SettingsPage() {
           gmailAddress={student.gmailAddress}
           status={status}
           lastSyncAt={conn?.lastSyncAt ?? null}
-          showInboxLink={status === "connected"}
+          showInboxLink={false}
         />
       </div>
 
       <section className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-          Bilgileri düzenle
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+          Portal giriş bilgileri
         </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+          Portala giriş yaparken kullandığın e-posta ve şifreyi buradan güncelleyebilirsin.
+        </p>
         <EditProfileForm
-          studentId={student.id}
           initialName={student.name}
-          initialStudentEmail={student.studentEmail}
+          initialLoginEmail={loginEmail}
         />
       </section>
     </div>

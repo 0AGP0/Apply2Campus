@@ -3,36 +3,41 @@
 import { useState } from "react";
 
 export function EditProfileForm({
-  studentId,
   initialName,
-  initialStudentEmail,
+  initialLoginEmail,
 }: {
-  studentId: string;
   initialName: string;
-  initialStudentEmail: string | null;
+  initialLoginEmail: string | null;
 }) {
   const [name, setName] = useState(initialName);
-  const [studentEmail, setStudentEmail] = useState(initialStudentEmail ?? "");
+  const [loginEmail, setLoginEmail] = useState(initialLoginEmail ?? "");
+  const [newPassword, setNewPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
+    if (!loginEmail.trim()) {
+      setMessage({ type: "error", text: "Giriş e-postası gerekli." });
+      return;
+    }
     setSaving(true);
     try {
-      const res = await fetch(`/api/students/${studentId}`, {
+      const res = await fetch("/api/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim() || initialName,
-          studentEmail: studentEmail.trim() || null,
+          loginEmail: loginEmail.trim().toLowerCase(),
+          ...(newPassword ? { newPassword } : {}),
         }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setMessage({ type: "ok", text: "Bilgiler kaydedildi." });
+        setMessage({ type: "ok", text: "Portal giriş bilgileri kaydedildi." });
+        setNewPassword("");
       } else {
-        const data = await res.json().catch(() => ({}));
         setMessage({ type: "error", text: data.error ?? "Kaydedilemedi." });
       }
     } finally {
@@ -56,17 +61,35 @@ export function EditProfileForm({
       </div>
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-          E-posta (kurum / iletişim)
+          Giriş e-postası
         </label>
         <input
           type="email"
-          value={studentEmail}
-          onChange={(e) => setStudentEmail(e.target.value)}
+          value={loginEmail}
+          onChange={(e) => setLoginEmail(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          placeholder="iletisim@example.com"
+          placeholder="portala girişte kullandığın e-posta"
+          required
         />
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Gmail bağlantısından farklı; danışmanla paylaşabileceğin iletişim e-postası.
+          Bu e-posta ile portala giriş yaparsın.
+        </p>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          Yeni şifre (opsiyonel)
+        </label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          placeholder="Değiştirmek istemiyorsan boş bırak"
+          minLength={8}
+          maxLength={128}
+        />
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          En az 8 karakter. Sadece değiştirmek istediğinde doldur.
         </p>
       </div>
       {message && (

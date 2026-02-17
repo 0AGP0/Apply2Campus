@@ -18,9 +18,9 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <div className="flex min-h-screen bg-background-light dark:bg-background-dark font-display">
-      {/* Desktop sidebar — tüm sayfalarda aynı */}
-      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hidden lg:flex flex-col shrink-0">
+    <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark font-display">
+      {/* Desktop sidebar — sabit yükseklik, içerik uzasa da kaymaz */}
+      <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:h-screen lg:overflow-y-auto bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
         <AppSidebar user={user} pathname={pathname ?? ""} />
       </aside>
 
@@ -46,7 +46,7 @@ export function AppLayout({ children, user }: AppLayoutProps) {
         </>
       )}
 
-      <main className="flex-1 overflow-y-auto flex flex-col min-w-0 bg-gradient-to-b from-slate-50/90 to-slate-100/80 dark:from-slate-950/90 dark:to-slate-900/80 pt-14 lg:pt-0">
+      <main className="flex-1 min-h-0 min-w-0 overflow-y-auto flex flex-col bg-gradient-to-b from-slate-50/90 to-slate-100/80 dark:from-slate-950/90 dark:to-slate-900/80 pt-14 lg:pt-0">
         {children}
       </main>
     </div>
