@@ -12,6 +12,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-crm": "tsx prisma/seed-crm.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
