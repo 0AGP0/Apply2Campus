@@ -325,6 +325,7 @@ model CatalogItem {
   @@index([country])
   @@index([country, city])
   @@index([country, city, schoolName])
+  @@map("catalog_item")
 }
 
 // Öğrenciye gönderilen teklif

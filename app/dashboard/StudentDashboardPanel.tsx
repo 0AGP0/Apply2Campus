@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback } from "react";
 import { StudentCrmCard } from "./StudentCrmCard";
 
 type Stage = { slug: string; name: string; sortOrder: number };
@@ -19,6 +20,10 @@ export function StudentDashboardPanel({
   const currentIndex = stages.findIndex((s) => s.slug === currentStageSlug);
   const effectiveIndex = currentIndex >= 0 ? currentIndex : 0;
 
+  const scrollToCard = useCallback(() => {
+    document.getElementById("kart")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
   const tasks = [
     {
       id: "gmail",
@@ -27,6 +32,7 @@ export function StudentDashboardPanel({
       done: gmailConnected,
       href: "/dashboard/settings",
       cta: "Ayarlara git",
+      isAnchor: false,
     },
     {
       id: "card",
@@ -35,6 +41,7 @@ export function StudentDashboardPanel({
       done: false,
       href: "#kart",
       cta: "Kartı doldur",
+      isAnchor: true,
     },
   ];
 
@@ -158,13 +165,24 @@ export function StudentDashboardPanel({
                 </div>
               </div>
               {!task.done && (
-                <Link
-                  href={task.href}
-                  className="shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-                >
-                  {task.cta}
-                  <span className="material-icons-outlined text-lg">arrow_forward</span>
-                </Link>
+                task.isAnchor ? (
+                  <button
+                    type="button"
+                    onClick={scrollToCard}
+                    className="shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                  >
+                    {task.cta}
+                    <span className="material-icons-outlined text-lg">arrow_forward</span>
+                  </button>
+                ) : (
+                  <Link
+                    href={task.href}
+                    className="shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                  >
+                    {task.cta}
+                    <span className="material-icons-outlined text-lg">arrow_forward</span>
+                  </Link>
+                )
               )}
             </li>
           ))}
