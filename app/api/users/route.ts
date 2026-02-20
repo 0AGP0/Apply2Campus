@@ -57,7 +57,25 @@ export async function GET() {
       return NextResponse.json({ consultants: users, admins });
     } catch (e2) {
       console.error("GET /api/users fallback error:", e2);
-      return NextResponse.json({ error: "Liste yüklenemedi." }, { status: 500 });
+      try {
+        const usersMinimal = await prisma.user.findMany({
+          where: {
+            role: { in: ["CONSULTANT", "OPERATION_UNIVERSITY", "OPERATION_ACCOMMODATION", "OPERATION_VISA"] },
+          },
+          select: { id: true, name: true, email: true, role: true },
+        });
+        const adminsMinimal = await prisma.user.findMany({
+          where: { role: "ADMIN" },
+          select: { id: true, name: true, email: true },
+        });
+        return NextResponse.json({
+          consultants: usersMinimal.map((u) => ({ ...u, _count: { assignedStudents: 0 }, assignedStudents: [], auditLogs: [] })),
+          admins: adminsMinimal,
+        });
+      } catch (e3) {
+        console.error("GET /api/users minimal error:", e3);
+        return NextResponse.json({ error: "Liste yüklenemedi." }, { status: 500 });
+      }
     }
   }
 }
