@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-
-const COUNTRY_OPTIONS = [
-  { value: "TR", label: "Türkiye" }, { value: "DE", label: "Almanya" }, { value: "AT", label: "Avusturya" },
-  { value: "CH", label: "İsviçre" }, { value: "US", label: "ABD" }, { value: "GB", label: "Birleşik Krallık" },
-  { value: "NL", label: "Hollanda" }, { value: "FR", label: "Fransa" }, { value: "IT", label: "İtalya" },
-  { value: "ES", label: "İspanya" }, { value: "AZ", label: "Azerbaycan" }, { value: "KZ", label: "Kazakistan" },
-  { value: "OTHER", label: "Diğer" },
-];
+import { COUNTRY_OPTIONS } from "@/lib/countries";
 
 type Field = {
   id: string;
@@ -22,7 +15,7 @@ type Field = {
 
 type Section = { id: string; slug: string; name: string; sortOrder: number; fields: Field[] };
 type ValueItem = { fieldSlug: string; value: string };
-type DocItem = { id: string; fieldSlug: string; fieldLabel: string; fileName: string; fileSize: number | null; uploadedAt: string };
+type DocItem = { id: string; fieldSlug: string; fieldLabel: string; fileName: string; fileSize: number | null; uploadedAt: string; version?: number; status?: string };
 
 export function CrmCardClient({ studentId, editable = false }: { studentId: string; editable?: boolean }) {
   const [sections, setSections] = useState<Section[]>([]);
@@ -125,7 +118,7 @@ export function CrmCardClient({ studentId, editable = false }: { studentId: stri
       throw new Error(data.error ?? "Yükleme başarısız");
     }
     const doc = await res.json();
-    setDocuments((prev) => [...prev, { id: doc.id, fieldSlug, fieldLabel: "", fileName: doc.fileName, fileSize: null, uploadedAt: doc.uploadedAt }]);
+    setDocuments((prev) => [...prev, { id: doc.id, fieldSlug, fieldLabel: "", fileName: doc.fileName, fileSize: null, uploadedAt: doc.uploadedAt, version: doc.version, status: doc.status }]);
   }
 
   function getOptions(field: Field) {
@@ -216,7 +209,7 @@ export function CrmCardClient({ studentId, editable = false }: { studentId: stri
                               ) : (
                                 <ul className="flex flex-wrap gap-2">
                                   {docs.map((d) => (
-                                    <li key={d.id}>
+                                    <li key={d.id} className="flex flex-wrap items-center gap-2">
                                       <a
                                         href={`/api/students/${studentId}/documents/${d.id}`}
                                         target="_blank"
@@ -226,6 +219,26 @@ export function CrmCardClient({ studentId, editable = false }: { studentId: stri
                                         <span className="material-icons-outlined text-base">attach_file</span>
                                         {d.fileName}
                                       </a>
+                                      <span className="text-xs text-slate-500">v{d.version ?? 1} · {new Date(d.uploadedAt).toLocaleDateString("tr-TR")}</span>
+                                      {editable && (
+                                        <select
+                                          value={d.status ?? "UPLOADED"}
+                                          onChange={async (e) => {
+                                            const newStatus = e.target.value;
+                                            const res = await fetch(`/api/students/${studentId}/documents/${d.id}`, {
+                                              method: "PATCH",
+                                              headers: { "Content-Type": "application/json" },
+                                              body: JSON.stringify({ status: newStatus }),
+                                            });
+                                            if (res.ok) setDocuments((prev) => prev.map((x) => x.id === d.id ? { ...x, status: newStatus } : x));
+                                          }}
+                                          className="text-xs rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-1 px-2"
+                                        >
+                                          <option value="UPLOADED">Yüklendi</option>
+                                          <option value="APPROVED">Onaylandı</option>
+                                          <option value="REVISION_REQUESTED">Revize istendi</option>
+                                        </select>
+                                      )}
                                     </li>
                                   ))}
                                 </ul>

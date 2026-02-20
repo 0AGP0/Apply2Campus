@@ -11,6 +11,9 @@ datasource db {
 enum Role {
   ADMIN
   CONSULTANT
+  OPERATION_UNIVERSITY
+  OPERATION_ACCOMMODATION
+  OPERATION_VISA
   STUDENT
 }
 
@@ -39,6 +42,10 @@ model User {
   createdOffers          Offer[]
   accounts              Account[]
   sessions              Session[]
+  consultantSlots       ConsultantSlot[]       @relation("ConsultantSlots")
+  appointmentRequestsAsConsultant AppointmentRequest[] @relation("AppointmentRequestsAsConsultant")
+  tasksAssignedBy       Task[]                 @relation("TaskAssignedBy")
+  tasksAssignedTo       Task[]                 @relation("TaskAssignedTo")
 }
 
 model Account {
@@ -94,6 +101,10 @@ model Student {
   gmailAddress         String?
   stage                String    @default("lead")  // Stage.slug ile eşleşir; aşama silinirse öğrenci fallback'e taşınır
   assignedConsultantId String?
+  visaInstitution      String?   // Kayıt olunan kurum
+  visaCity             String?
+  visaProgramStartDate DateTime? // Program başlangıç tarihi
+  visaNotes            String?   @db.Text // Bilgi (teklifin kabulü vb.)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -107,11 +118,87 @@ model Student {
   folders         Folder[]
   crmValues       CrmValue[]
   documents       StudentDocument[]
+  documentsByCategory StudentDocumentByCategory[]
   offers          Offer[]
+  applications   StudentApplication[]
+  appointmentRequests AppointmentRequest[]
+  tasks               Task[]
 
   @@index([assignedConsultantId])
   @@index([stage])
   @@index([gmailAddress])
+}
+
+// Danışman müsait saatleri (takvim slotları)
+model ConsultantSlot {
+  id           String   @id @default(cuid())
+  consultantId String
+  slotDate     DateTime @db.Date
+  startTime    String   // "09:00"
+  endTime      String   // "09:30"
+  createdAt    DateTime @default(now())
+
+  consultant User @relation("ConsultantSlots", fields: [consultantId], references: [id], onDelete: Cascade)
+  appointmentRequests AppointmentRequest[]
+
+  @@index([consultantId])
+  @@index([slotDate])
+}
+
+// Öğrencinin görüşme talebi
+enum AppointmentRequestStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+model AppointmentRequest {
+  id           String                  @id @default(cuid())
+  studentId    String
+  consultantId String
+  slotId       String
+  status       AppointmentRequestStatus @default(PENDING)
+  note         String?                 @db.Text
+  createdAt    DateTime                @default(now())
+
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  consultant User @relation("AppointmentRequestsAsConsultant", fields: [consultantId], references: [id], onDelete: Cascade)
+  slot       ConsultantSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([consultantId])
+  @@index([slotId])
+}
+
+// Danışman ↔ Operasyon görev atama
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+}
+
+model Task {
+  id                 String     @id @default(cuid())
+  title              String
+  description        String?    @db.Text
+  assignedById       String
+  assignedToId       String
+  studentId          String?
+  relatedEmailId     String?    @unique // Mail'den görev oluşturulduğunda bağlantı
+  status             TaskStatus @default(PENDING)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  assignedBy   User    @relation("TaskAssignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+  assignedTo   User    @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: Cascade)
+  student      Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  relatedEmail EmailMessage? @relation("TaskFromEmail", fields: [relatedEmailId], references: [id], onDelete: SetNull)
+
+  @@index([assignedById])
+  @@index([assignedToId])
+  @@index([studentId])
+  @@index([relatedEmailId])
+  @@index([status])
 }
 
 // CRM: Form bölümleri (Kişisel, Aile, Pasaport, Eğitim, Belgeler) — admin'den düzenlenebilir
@@ -171,21 +258,94 @@ model CrmValue {
   @@index([crmFieldId])
 }
 
+enum DocumentStatus {
+  UPLOADED
+  APPROVED
+  REVISION_REQUESTED
+}
+
 model StudentDocument {
-  id         String   @id @default(cuid())
+  id         String          @id @default(cuid())
   studentId  String
   crmFieldId String
   fileName   String
   filePath   String
   mimeType   String?
   fileSize   Int?
-  uploadedAt DateTime @default(now())
+  version    Int             @default(1)
+  status     DocumentStatus  @default(UPLOADED)
+  uploadedAt DateTime        @default(now())
 
   student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   crmField CrmField @relation(fields: [crmFieldId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([studentId, crmFieldId])
+}
+
+enum DocumentCategoryType {
+  OPERATION_UPLOADED
+  STUDENT_UPLOADED
+}
+
+model DocumentCategory {
+  id    String                @id @default(cuid())
+  slug  String                @unique
+  name  String
+  type  DocumentCategoryType
+  sortOrder Int               @default(0)
+
+  documents StudentDocumentByCategory[]
+
+  @@index([type])
+}
+
+model StudentDocumentByCategory {
+  id          String          @id @default(cuid())
+  studentId   String
+  categoryId  String
+  fileName    String
+  filePath    String
+  mimeType    String?
+  fileSize    Int?
+  version     Int             @default(1)
+  status      DocumentStatus  @default(UPLOADED)
+  uploadedAt  DateTime        @default(now())
+  uploadedBy  String?
+
+  student  Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  category DocumentCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  acceptanceForApplication StudentApplication?
+
+  @@index([studentId])
+  @@index([studentId, categoryId])
+}
+
+enum ApplicationStatus {
+  BASVURU_YAPILDI   // Başvuru yapıldı
+  KABUL_BEKLENIYOR  // Kabul bekleniyor
+  KABUL_ALINDI      // Kabul alındı
+  REDDEDILDI        // Reddedildi
+}
+
+model StudentApplication {
+  id                    String             @id @default(cuid())
+  studentId             String
+  universityName        String
+  program               String?
+  applicationDate       DateTime?
+  status                ApplicationStatus  @default(BASVURU_YAPILDI)
+  notes                 String?            @db.Text
+  acceptanceDocumentId  String?            @unique  // Üniversite Kabulü belgesi yüklendiğinde
+  secondInstallmentAmount Decimal?         @db.Decimal(12, 2)  // 2. taksit tutarı
+  secondInstallmentDueDate DateTime?       // 2. taksit son ödeme tarihi
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  student               Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  acceptanceDocument    StudentDocumentByCategory? @relation(fields: [acceptanceDocumentId], references: [id], onDelete: SetNull)
+
+  @@index([studentId])
 }
 
 model Badge {
@@ -227,7 +387,7 @@ model GmailConnection {
 
 model EmailMessage {
   id             String    @id @default(cuid())
-  studentId      String
+  studentId      String?   // null = öğrenciye bağlanmamış (operasyon ortak inbox)
   gmailMessageId String
   threadId       String
   from           String?
@@ -242,14 +402,28 @@ model EmailMessage {
   rawPayload     String?   @db.Text
   createdAt      DateTime  @default(now())
 
-  student          Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student          Student?           @relation(fields: [studentId], references: [id], onDelete: Cascade)
   emailMessageBadges EmailMessageBadge[]
+  internalNotes    EmailInternalNote[]
+  tasksFromMail    Task[]             @relation("TaskFromEmail")
 
   @@unique([studentId, gmailMessageId])
   @@index([studentId])
   @@index([studentId, internalDate])
   @@index([threadId])
   @@index([internalDate])
+}
+
+model EmailInternalNote {
+  id             String   @id @default(cuid())
+  emailMessageId String
+  userId         String
+  note           String   @db.Text
+  createdAt      DateTime @default(now())
+
+  emailMessage EmailMessage @relation(fields: [emailMessageId], references: [id], onDelete: Cascade)
+
+  @@index([emailMessageId])
 }
 
 model EmailMessageBadge {
@@ -310,6 +484,95 @@ model ConsultantNotification {
   @@index([userId, readAt])
 }
 
+// Etkinlikler – Duyurular (öğrenci genel bakış)
+model Announcement {
+  id        String    @id @default(cuid())
+  type      String    // DUYURU | ETKINLIK
+  title     String
+  body      String?   @db.Text
+  startDate DateTime? @db.Date
+  endDate   DateTime? @db.Date
+  sortOrder Int       @default(0)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  @@index([active])
+  @@index([sortOrder])
+}
+
+// Kurum Kartı – teklifte kurum + başlangıç/bitiş tarihi ile fiyat
+enum InstitutionType {
+  UNIVERSITY
+  LANGUAGE_COURSE
+  ACCOMMODATION
+  OTHER
+}
+
+model Institution {
+  id              String          @id @default(cuid())
+  type            InstitutionType
+  name            String
+  logoUrl         String?
+  description     String?         @db.Text
+  address         String?         @db.Text
+  catalogPdfPath  String?         // Katalog PDF (yüklenen dosya)
+  sortOrder       Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  services InstitutionService[]
+  images   InstitutionImage[]
+
+  @@index([type])
+}
+
+model InstitutionImage {
+  id            String   @id @default(cuid())
+  institutionId String
+  filePath      String
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId])
+}
+
+enum InstitutionServiceGroup {
+  EDUCATION
+  ACCOMMODATION
+  OTHER
+}
+
+model InstitutionService {
+  id            String                 @id @default(cuid())
+  institutionId String
+  group         InstitutionServiceGroup
+  name          String
+  sortOrder     Int                    @default(0)
+  createdAt     DateTime               @default(now())
+
+  institution Institution        @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  prices      InstitutionPrice[]
+
+  @@index([institutionId])
+}
+
+model InstitutionPrice {
+  id            String    @id @default(cuid())
+  serviceId     String
+  startDate     DateTime  @db.Date
+  endDate       DateTime  @db.Date
+  amount        Decimal   @db.Decimal(12, 2)
+  currency      String    @default("EUR")
+  createdAt     DateTime  @default(now())
+
+  service InstitutionService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId])
+  @@index([serviceId, startDate, endDate])
+}
+
 // Teklif kataloğu – ürün/attribute yapısı (ülke + şehir, okul, program + süre fiyatları)
 // attributes: { "2": 1500, "8": 4000, "currency": "EUR", ... }
 model CatalogItem {
@@ -352,18 +615,22 @@ model Offer {
   @@index([status])
 }
 
-// Teklif kalemi (gönderilirken katalogdan kopyalanan anlık veri)
+// Teklif kalemi (gönderilirken katalogdan veya kurum kartından kopyalanan anlık veri)
 model OfferItem {
   id            String   @id @default(cuid())
   offerId       String
   city          String
-  schoolName    String   // Okul Adı
+  schoolName    String   // Okul Adı (legacy veya kurum adı)
   program       String
   programGroup  String?  // Program_Grup: Eğitim, Konaklama, Diğer vb.
-  durationWeeks Int      // 2, 8, 12, 16, 24, 32
+  durationWeeks Int?     // 2, 8, 12, 16 (legacy); kurum kartında startDate-endDate kullanılır
   amount        Decimal  @db.Decimal(12, 2)
   currency      String?  // EUR, USD, ...
   sortOrder     Int      @default(0)
+  // Kurum kartından eklendiğinde:
+  institutionId String?
+  startDate     DateTime? @db.Date
+  endDate       DateTime? @db.Date
 
   offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
   @@index([offerId])

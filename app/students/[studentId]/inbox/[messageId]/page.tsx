@@ -56,6 +56,7 @@ export default async function EmailDetailPage({
         message={message}
         thread={thread}
         stages={stages}
+        canAddNotes={role !== "STUDENT"}
       />
     </div>
   );

@@ -6,6 +6,16 @@
 /** Fiyat tanımlı süreler (hafta). Yeni süre eklemek için bu listeye ekle. */
 export const DURATION_KEYS = ["2", "8", "12", "16", "24", "32"] as const;
 
+/** UI için süre seçenekleri (teklif formu vb.) – tek kaynak. */
+export const DURATION_OPTIONS = [
+  { value: 2, label: "2 Hafta" },
+  { value: 8, label: "8 Hafta" },
+  { value: 12, label: "12 Hafta" },
+  { value: 16, label: "16 Hafta" },
+  { value: 24, label: "24 Hafta" },
+  { value: 32, label: "32 Hafta" },
+] as const;
+
 export const CURRENCY_KEY = "currency";
 
 /** Program grubu (kategori): Eğitim, Konaklama, Diğer vb. */

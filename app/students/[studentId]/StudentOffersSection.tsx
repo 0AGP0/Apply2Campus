@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { DURATION_OPTIONS } from "@/lib/catalog";
+import { getOfferStatusLabel, ACTIVE_OFFER_STATUSES } from "@/lib/offer-status";
+
+/** Kurum kartı (teklifte kurum + tarih aralığı ile fiyat). */
+type InstitutionService = { id: string; group: string; groupLabel: string; name: string; prices: { id: string; startDate: string; endDate: string; amount: number; currency: string }[] };
+type Institution = { id: string; type: string; typeLabel: string; name: string; services: InstitutionService[] };
 
 /** Katalog ürünü (attribute tabanlı: süre → fiyat). */
 type CatalogRow = {
@@ -14,13 +20,16 @@ type CatalogRow = {
 };
 
 type OfferItem = {
-  city: string;
+  city?: string;
   schoolName: string;
   program: string;
   programGroup?: string;
-  durationWeeks: number;
+  durationWeeks?: number;
   amount: number;
   currency?: string;
+  institutionId?: string;
+  startDate?: string;
+  endDate?: string;
 };
 
 type Offer = {
@@ -35,15 +44,6 @@ type Offer = {
   createdAt: string;
   items: { city: string; schoolName: string; program: string; programGroup?: string; durationWeeks: number; amount: number; currency?: string }[];
 };
-
-const DURATIONS = [
-  { value: 2, label: "2 Hafta" },
-  { value: 8, label: "8 Hafta" },
-  { value: 12, label: "12 Hafta" },
-  { value: 16, label: "16 Hafta" },
-  { value: 24, label: "24 Hafta" },
-  { value: 32, label: "32 Hafta" },
-];
 
 function getAmount(row: CatalogRow, durationWeeks: number): number | null {
   return row.priceByDuration[String(durationWeeks)] ?? null;
@@ -82,18 +82,8 @@ export function StudentOffersSection({ studentId }: { studentId: string }) {
     }
   }, [modalOpen]);
 
-  const statusLabel: Record<string, string> = {
-    DRAFT: "Taslak",
-    SENT: "Gönderildi",
-    VIEWED: "Görüntülendi",
-    ACCEPTED: "Kabul edildi",
-    REJECTED: "Reddedildi",
-    REVISION_REQUESTED: "Revizyon istendi",
-  };
-
-  const ACTIVE_STATUSES = ["DRAFT", "SENT", "VIEWED", "REVISION_REQUESTED"];
-  const activeOffers = offers.filter((o) => ACTIVE_STATUSES.includes(o.status));
-  const pastOffers = offers.filter((o) => !ACTIVE_STATUSES.includes(o.status));
+  const activeOffers = offers.filter((o) => ACTIVE_OFFER_STATUSES.includes(o.status as (typeof ACTIVE_OFFER_STATUSES)[number]));
+  const pastOffers = offers.filter((o) => !ACTIVE_OFFER_STATUSES.includes(o.status as (typeof ACTIVE_OFFER_STATUSES)[number]));
 
   function OfferRow({ o }: { o: Offer }) {
     return (
@@ -101,7 +91,7 @@ export function StudentOffersSection({ studentId }: { studentId: string }) {
         <div>
           <p className="font-medium text-slate-900 dark:text-slate-100">{o.title}</p>
           <p className="text-xs text-slate-500 mt-0.5">
-            {statusLabel[o.status] ?? o.status}
+            {getOfferStatusLabel(o.status)}
             {o.sentAt && ` · Gönderilme: ${new Date(o.sentAt).toLocaleDateString("tr-TR")}`}
             {o.respondedAt && ` · Yanıt: ${new Date(o.respondedAt).toLocaleDateString("tr-TR")}`}
           </p>
@@ -201,7 +191,22 @@ function OfferFormModal({
   const [items, setItems] = useState<OfferItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [step, setStep] = useState<"form" | "addItem">("form");
+  const [step, setStep] = useState<"form" | "addItem" | "addItemKurum">("form");
+  const [addItemSource, setAddItemSource] = useState<"katalog" | "kurum">("katalog");
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+
+  useEffect(() => {
+    fetch("/api/institutions")
+      .then((r) => r.json())
+      .then((d) => setInstitutions(d.institutions ?? []))
+      .catch(() => setInstitutions([]));
+  }, []);
+  const [selectedInstitution, setSelectedInstitution] = useState("");
+  const [selectedService, setSelectedService] = useState("");
+  const [kurumStartDate, setKurumStartDate] = useState("");
+  const [kurumEndDate, setKurumEndDate] = useState("");
+  const [kurumPrice, setKurumPrice] = useState<{ amount: number; currency: string; serviceName: string; institutionName: string } | null>(null);
+  const [kurumPriceLoading, setKurumPriceLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
@@ -219,6 +224,44 @@ function OfferFormModal({
 
   const selectedRows = rows.filter((r) => selectedRowIds.has(r.id));
   const canAddSelected = selectedRows.length > 0 && selectedRows.every((r) => getAmount(r, selectedDuration) != null);
+  const inst = institutions.find((i) => i.id === selectedInstitution);
+  const service = inst?.services.find((s) => s.id === selectedService);
+
+  async function fetchKurumPrice() {
+    if (!selectedService || !kurumStartDate || !kurumEndDate) return;
+    setKurumPriceLoading(true);
+    setKurumPrice(null);
+    try {
+      const res = await fetch(`/api/institution-prices?serviceId=${encodeURIComponent(selectedService)}&startDate=${encodeURIComponent(kurumStartDate)}&endDate=${encodeURIComponent(kurumEndDate)}`);
+      const data = await res.json();
+      if (res.ok && data.price) setKurumPrice({ amount: data.price.amount, currency: data.price.currency, serviceName: data.price.serviceName, institutionName: data.price.institutionName });
+      else setKurumPrice(null);
+    } catch {
+      setKurumPrice(null);
+    } finally {
+      setKurumPriceLoading(false);
+    }
+  }
+
+  function addKurumItem() {
+    if (!kurumPrice || !inst || !service) return;
+    const newItem: OfferItem = {
+      schoolName: kurumPrice.institutionName,
+      program: kurumPrice.serviceName,
+      amount: kurumPrice.amount,
+      currency: kurumPrice.currency,
+      institutionId: inst.id,
+      startDate: kurumStartDate,
+      endDate: kurumEndDate,
+    };
+    setItems((prev) => [...prev, newItem]);
+    setKurumPrice(null);
+    setSelectedInstitution("");
+    setSelectedService("");
+    setKurumStartDate("");
+    setKurumEndDate("");
+    setStep("form");
+  }
 
   function toggleRow(rowId: string) {
     setSelectedRowIds((prev) => {
@@ -311,13 +354,22 @@ function OfferFormModal({
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Kalemler (katalogdan)</label>
-                    <button
-                      type="button"
-                      onClick={() => setStep("addItem")}
-                      className="text-sm font-medium text-primary hover:underline"
-                    >
-                      + Kalem ekle
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setStep("addItem"); setAddItemSource("katalog"); }}
+                        className="text-sm font-medium text-primary hover:underline"
+                      >
+                        + Katalogdan ekle
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setStep("addItemKurum"); setAddItemSource("kurum"); setSelectedInstitution(""); setSelectedService(""); setKurumStartDate(""); setKurumEndDate(""); setKurumPrice(null); }}
+                        className="text-sm font-medium text-primary hover:underline"
+                      >
+                        + Kurum kartından ekle
+                      </button>
+                    </div>
                   </div>
                   {items.length === 0 ? (
                     <p className="text-sm text-slate-500 py-2">Henüz kalem eklenmedi. İsteğe bağlı.</p>
@@ -325,7 +377,13 @@ function OfferFormModal({
                     <ul className="space-y-2">
                       {items.map((it, i) => (
                         <li key={i} className="flex justify-between items-center text-sm py-2 border-b border-slate-100 dark:border-slate-800">
-                          <span>{it.city} · {it.schoolName}{it.programGroup ? ` · ${it.programGroup}` : ""} · {it.program} ({it.durationWeeks} hf) · {it.amount} {it.currency ?? "€"}</span>
+                          <span>
+                            {it.startDate && it.endDate ? (
+                              <>{it.schoolName} · {it.program} · {it.startDate}–{it.endDate} · {it.amount} {it.currency ?? "€"}</>
+                            ) : (
+                              <>{it.city ?? it.schoolName} · {it.schoolName}{it.programGroup ? ` · ${it.programGroup}` : ""} · {it.program} ({(it.durationWeeks ?? 0)} hf) · {it.amount} {it.currency ?? "€"}</>
+                            )}
+                          </span>
                           <button
                             type="button"
                             onClick={() => setItems((p) => p.filter((_, j) => j !== i))}
@@ -381,7 +439,7 @@ function OfferFormModal({
                         onChange={(e) => setSelectedDuration(Number(e.target.value))}
                         className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800"
                       >
-                        {DURATIONS.map((d) => (
+                        {DURATION_OPTIONS.map((d) => (
                           <option key={d.value} value={d.value}>{d.label}</option>
                         ))}
                       </select>
@@ -415,7 +473,7 @@ function OfferFormModal({
                       </div>
                       {selectedRows.length > 0 && (
                         <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                          {selectedRows.length} program seçildi. Seçilen süre: {DURATIONS.find((d) => d.value === selectedDuration)?.label ?? selectedDuration} hafta.
+                          {selectedRows.length} program seçildi. Seçilen süre: {DURATION_OPTIONS.find((d) => d.value === selectedDuration)?.label ?? selectedDuration} hafta.
                         </p>
                       )}
                     </div>
@@ -426,19 +484,21 @@ function OfferFormModal({
           )}
         </div>
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-2">
-          {step === "addItem" ? (
+          {step === "addItem" || step === "addItemKurum" ? (
             <>
               <button type="button" onClick={() => setStep("form")} className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-sm font-medium">
                 Geri
               </button>
-              <button
-                type="button"
-                onClick={addSelectedItems}
-                disabled={!canAddSelected}
-                className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium disabled:opacity-50"
-              >
-                Seçilenleri ekle ({selectedRows.length})
-              </button>
+              {step === "addItem" && (
+                <button
+                  type="button"
+                  onClick={addSelectedItems}
+                  disabled={!canAddSelected}
+                  className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium disabled:opacity-50"
+                >
+                  Seçilenleri ekle ({selectedRows.length})
+                </button>
+              )}
             </>
           ) : (
             <>

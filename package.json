@@ -13,6 +13,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed-crm": "tsx prisma/seed-crm.ts",
+    "db:seed-document-categories": "tsx prisma/seed-document-categories.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

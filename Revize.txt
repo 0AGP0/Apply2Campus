@@ -1,0 +1,125 @@
+APPLY2CAMPUS 
+
+1) UX/UI Genel İlkeler
+•	“Eski portal görünümü” referans alınarak aynı görsel dil / layout korunacak.
+•	Üst sağ global bar zorunlu:
+•	🔔 Bildirimler- Öğrencinin yapması gereken görevler 
+•	👤 Profil menüsü
+•	⚙️ Ayarlar / çıkış
+•	“Yardıma ihtiyacın mı var?” alanı görsel kart yapısında olacak:
+o	Eğitim danışmanı foto + isim + kısa açıklama
+o	Kart tıklanınca takvim modalı açılır
+o	Öğrenci uygun slot seçerek görüşme talebi oluşturur
+________________________________________
+2) Roller ve Yetkiler (RBAC)
+Roller
+1.	Admin
+2.	Eğitim Danışmanı
+3.	Operasyon Ekibi
+o	3.1 Üniversite Sorumlusu
+o	3.2 Konaklama & Dil Kursu Sorumlusu
+o	3.3 Vize Sorumlusu
+4.	Öğrenci
+Temel Yetki Prensipleri
+•	Öğrenci sadece kendi dosyasını görür.
+•	Eğitim danışmanı kendi öğrencilerini görür.
+•	Operasyon ekibi (3 alt rol) tüm danışanları ve Kendi görevlerini ve süreç ekranlarını görür.
+•	Operasyon ekibi için tek, ortak mail inboxı: operasyon kullanıcıları tüm operasyon e-postalarını tek inbox üzerinden görür/işler.
+•	Eğitim danışmanı ↔ Operasyon ekibi birbirine görev atayabilir (mutual assignment).
+________________________________________
+3) Navigasyon / Menü Yapısı (Öğrenci Paneli)
+3.1 Genel Bakış
+•	Süreç ilerleme barı (stage timeline)
+•	Aktif uyarılar
+•	Etkinlikler - Duyurular
+3.2 Profilim
+Alt sekmeler:
+•	Kişisel Bilgiler (vesikalık foto yükleme dahil)
+•	Aile Bilgileri
+•	Pasaport Bilgileri
+•	Eğitim Geçmişi
+•	Ayarlar (şifre, bildirim tercihleri vb.)
+3.3 Başvurularım
+•	Eski portal ekranı kopyalanabilir.
+•	Üniversite başvuru kartları:
+o	Üniversite / program / başvuru tarihi / durum / notlar
+•	Kabul belgesi operasyon tarafından yüklendiğinde burada 2. Taksit ödemesi ile görünür.
+3.4 Dökümanlar
+3.5.1 Kişisel Belgeler ve tercümeler 
+Belge yüklenirken otomatik isimlendirme yapılabilir seçilen kategoriye göre. 
+•	Revize mekanizması: versiyonlama + tarih + durum
+•	Durumlar: Yüklendi / Onaylandı / Revize istendi
+3.5.2 Belgeler (Operasyonun yüklediği belgeler)
+Operasyon panelinden açılır listeden seçilerek yüklenir. Öğrenci bu belgeleri görebilir/indirebilir. Belge yüklenirken otomatik isimlendirme yapılabilir seçilen kategoriye göre. 
+•	Üniversite Kabulü
+•	Sigorta Belgesi
+•	Bloke Hesap Açılış Belgesi
+•	Bloke Hesap Belgesi
+•	Vize Motivasyon Mektubu
+•	Dil Kursu Proforma
+•	Dil Kursu Kayıt Belge
+•	Konaklama Sözleşme
+•	Lise Diploması DE
+•	Lise Mezuniyet DE
+•	Lise Transkript DE
+•	Açık Lise Öğrenim DE
+•	ÖSYM Sınav Sonuç DE
+•	ÖSYM Yerleştirme Belgesi DE
+•	Üniversite Öğrenci Belgesi DE
+•	Üniversite/Önlisans Diploması DE
+•	Üniversite/Önlisans Transkripti DE
+Bu kategoride de versiyonlama + tarih  kısmı olacak. Dönem Dönem bu belgeler de güncelleniyor.
+
+3.5.2 Öğrenci İçin Evrak Yükle (Açılır Liste)
+Öğrenci yükler, operasyon/danışman görür:
+•	Danışmanlık Sözleşmesi
+•	Kimlik Kartı
+•	Taksit Ödemesi
+•	Garantör Belgesi
+•	Bloke Hesap Ödemesi
+•	Dil Kursu Ödemesi
+•	Okul Kayıt Ödemesi
+
+Aynı belgeden yüklenince versiyonlama + tarih  kısmı olacak. 
+
+4.8 Vize Bilgileri
+•	Eski portaldan alınabilir (UI/logic).
+•	Ek alanlar:
+o	Bilgi Teklifin kabulü ile çekilebilir.
+o	Kayıt olunan kurum bilgisi
+o	Şehir
+o	Program başlangıç tarihi
+
+4.9 Eğitim Videoları
+YouTube playlist embed + 3 ana kategori:
+1.	Üniversite Kabul Süreci
+2.	Vizeye Doğru Liste
+3.	Almanya Rehberi
+Görev otomasyonlarında ilgili video “izle” linki olarak referanslanacak.
+________________________________________
+5) Operasyon Mail Inbox (Tek Inbox)
+Hedef
+Operasyon ekibi (3 alt rol) tüm operasyon e-postalarını tek bir ortak inbox üzerinden görmeli ve ilişkilendirebilmelidir.
+Temel İhtiyaçlar
+•	Mail listesi (filtre: öğrenci / konu / etiket / okunmadı)
+•	Maili öğrenci dosyasına bağlama
+•	İç not ekleme
+•	Görev oluşturma (mail üzerinden)
+•	Yetkiler: Operasyon kullanıcıları ortak inboxı görür; eğitim danışmanı opsiyonel (sadece kendi öğrencisine ait mailler için erişim) — karar admin ayarıyla.
+________________________________________
+6) Teklif Modülü – Kurum Kartı Yapısı
+Mevcut “satır satır okul ekleme” yerine Kurum Kartı oluşturma modeli.
+Kurum Kartı Alanları – Bu kart blog tarzında sitemizde de yayınlanabilir. 
+•	Tür: Üniversite / Dil Kursu / Konaklama / Diğer
+•	Logo
+•	Kurum adı
+•	Açıklama
+•	Adres
+•	Görseller (galeri)
+•	Katalog PDF yükleme
+Hizmetler (Alt tablo / alt satır)
+
+Hizmet  başlıkları Eğitim, Konaklama ve Diğer oalrak kalabilir. Sadece Hizmetlerde yer alan kısımlar bazı okullarda default olarak zorunlu. Bunu database’e yüklerken seçebilelim. 
+Ayrıca eğitim danışmanı teklif verirken kurum, eğitim ve hizmetleri seçtikten sonra hafta seçimi yerine başlangıç ve bitiş tarihi seçince fiyat bilgisi çıkması gerekiyor. 
+
+https://www.elt.com.tr/fiyat-teklifi-iste bu ekran örnek alınabilir.

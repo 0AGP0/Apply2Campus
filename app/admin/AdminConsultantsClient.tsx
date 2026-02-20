@@ -2,12 +2,20 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
+
+const ROLE_LABELS: Record<string, string> = {
+  CONSULTANT: "Danışman",
+  OPERATION_UNIVERSITY: "Üniversite Sorumlusu",
+  OPERATION_ACCOMMODATION: "Konaklama & Dil Kursu",
+  OPERATION_VISA: "Vize Sorumlusu",
+};
 
 type Consultant = {
   id: string;
   name: string | null;
   email: string | null;
+  role?: string;
   _count?: { assignedStudents: number };
   assignedStudents?: { id: string; name: string }[];
   auditLogs?: { createdAt: string; message: string | null }[];
@@ -41,6 +49,7 @@ export function AdminConsultantsClient() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newRole, setNewRole] = useState<string>("CONSULTANT");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -69,14 +78,16 @@ export function AdminConsultantsClient() {
 
   const stats = useMemo(() => {
     const total = consultants.length;
-    const totalStudents = consultants.reduce(
+    const consultantsOnly = consultants.filter((c) => c.role === "CONSULTANT");
+    const totalStudents = consultantsOnly.reduce(
       (s, c) => s + (c._count?.assignedStudents ?? c.assignedStudents?.length ?? 0),
       0
     );
-    const withZero = consultants.filter(
+    const withZero = consultantsOnly.filter(
       (c) => (c._count?.assignedStudents ?? c.assignedStudents?.length ?? 0) === 0
     ).length;
-    const avg = total > 0 ? (totalStudents / total).toFixed(1) : "0";
+    const consultantCount = consultantsOnly.length;
+    const avg = consultantCount > 0 ? (totalStudents / consultantCount).toFixed(1) : "0";
     return { total, totalStudents, withZero, avg };
   }, [consultants]);
 
@@ -90,9 +101,10 @@ export function AdminConsultantsClient() {
 
   async function handleDeleteConsultant(c: Consultant) {
     const count = c._count?.assignedStudents ?? c.assignedStudents?.length ?? 0;
-    const msg = count > 0
-      ? `"${c.name ?? c.email}" danışmanını silmek istediğinize emin misiniz? Atanan ${count} öğrencinin danışman ataması kaldırılacak.`
-      : `"${c.name ?? c.email}" danışmanını silmek istediğinize emin misiniz?`;
+    const isConsultant = c.role === "CONSULTANT";
+    const msg = isConsultant && count > 0
+      ? `"${c.name ?? c.email}" kullanıcısını silmek istediğinize emin misiniz? Atanan ${count} öğrencinin danışman ataması kaldırılacak.`
+      : `"${c.name ?? c.email}" kullanıcısını silmek istediğinize emin misiniz?`;
     if (!confirm(msg)) return;
     setDeletingId(c.id);
     const res = await fetch(`/api/users/${c.id}`, { method: "DELETE" });
@@ -115,7 +127,7 @@ export function AdminConsultantsClient() {
         name: name.trim() || null,
         email: email.trim(),
         password,
-        role: "CONSULTANT",
+        role: newRole,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -125,31 +137,30 @@ export function AdminConsultantsClient() {
       setName("");
       setEmail("");
       setPassword("");
+      setNewRole("CONSULTANT");
       fetchConsultants();
     } else {
-      setError(data.error ?? "Danışman oluşturulamadı");
+      setError(data.error ?? "Kullanıcı oluşturulamadı");
     }
   }
 
   return (
-    <div className="panel-page max-w-7xl">
-      <PageHeader
-        title="Danışmanlar"
-        subtitle="Danışman hesapları ve atanan öğrenciler"
-        actions={
-          <button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            className="btn-primary-panel w-full sm:w-auto"
-          >
-            <span className="material-icons-outlined text-lg">person_add</span>
-            Danışman ekle
-          </button>
-        }
-      />
-
+    <PanelLayout
+      title="Danışmanlar"
+      subtitle="Danışman ve operasyon hesapları"
+      actions={
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="btn-primary-panel w-full sm:w-auto"
+        >
+          <span className="material-icons-outlined text-lg">person_add</span>
+          Kullanıcı ekle
+        </button>
+      }
+    >
       {/* Özet kartları */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-6 sm:mt-8">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-4">
         <div className="panel-stat-card border-t-blue-500 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
           <div className="flex items-center justify-between mb-2">
             <div className="w-12 h-12 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
@@ -157,7 +168,7 @@ export function AdminConsultantsClient() {
             </div>
           </div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Toplam danışman
+            Toplam kullanıcı
           </p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">
             {stats.total}
@@ -241,8 +252,8 @@ export function AdminConsultantsClient() {
             {filtered.length === 0 ? (
               <div className="panel-card p-6 text-center text-slate-500">
                 {consultants.length === 0
-                  ? "Henüz danışman yok. Danışman ekle ile yeni hesap oluşturun."
-                  : "Arama kriterine uyan danışman bulunamadı."}
+                  ? "Henüz kullanıcı yok. Kullanıcı ekle ile danışman veya operasyon hesabı oluşturun."
+                  : "Arama kriterine uyan kullanıcı bulunamadı."}
               </div>
             ) : (
               filtered.map((c) => {
@@ -268,12 +279,15 @@ export function AdminConsultantsClient() {
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
                           {c.email}
                         </p>
-                        <p className="text-xs text-slate-500 mt-1.5">
-                          {lastLog ? formatAgo(lastLog.createdAt) : "—"}
+                        <p className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                            {ROLE_LABELS[c.role ?? "CONSULTANT"] ?? c.role}
+                          </span>
+                          {lastLog && <span className="text-xs text-slate-500">{formatAgo(lastLog.createdAt)}</span>}
                         </p>
                       </div>
                       <div className="shrink-0 flex items-center gap-1 text-primary font-semibold text-sm">
-                        <span className="tabular-nums">{count} öğrenci</span>
+                        <span className="tabular-nums">{c.role === "CONSULTANT" ? `${count} öğrenci` : "—"}</span>
                         <span className="material-icons-outlined text-lg">chevron_right</span>
                       </div>
                     </Link>
@@ -282,7 +296,7 @@ export function AdminConsultantsClient() {
                       onClick={() => handleDeleteConsultant(c)}
                       disabled={deletingId === c.id}
                       className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-500 hover:text-red-600 shrink-0"
-                      title="Danışmanı sil"
+                      title="Kullanıcıyı sil"
                     >
                       <span className="material-icons-outlined text-lg">delete</span>
                     </button>
@@ -309,8 +323,8 @@ export function AdminConsultantsClient() {
                   <tr>
                     <td colSpan={5} className="table-td text-center text-slate-500 py-16 bg-slate-50/30 dark:bg-slate-800/20">
                       {consultants.length === 0
-                        ? "Henüz danışman yok. Danışman ekle ile yeni hesap oluşturun."
-                        : "Arama kriterine uyan danışman bulunamadı."}
+                        ? "Henüz kullanıcı yok. Kullanıcı ekle ile danışman veya operasyon hesabı oluşturun."
+                        : "Arama kriterine uyan kullanıcı bulunamadı."}
                     </td>
                   </tr>
                 ) : (
@@ -325,22 +339,31 @@ export function AdminConsultantsClient() {
                             <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
                               {initials(displayName)}
                             </div>
-                            <p className="font-semibold text-slate-900 dark:text-white">
-                              {displayName}
-                            </p>
+                            <div>
+                              <p className="font-semibold text-slate-900 dark:text-white">
+                                {displayName}
+                              </p>
+                              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                {ROLE_LABELS[c.role ?? "CONSULTANT"] ?? c.role}
+                              </span>
+                            </div>
                           </div>
                         </td>
                         <td className="table-td text-slate-600 dark:text-slate-400">
                           {c.email}
                         </td>
                         <td className="table-td">
-                          <Link
-                            href={`/admin/ogrenciler?consultantId=${c.id}`}
-                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                          >
-                            <span className="tabular-nums">{count} öğrenci</span>
-                            <span className="material-icons-outlined text-base">arrow_forward</span>
-                          </Link>
+                          {c.role === "CONSULTANT" ? (
+                            <Link
+                              href={`/admin/ogrenciler?consultantId=${c.id}`}
+                              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                            >
+                              <span className="tabular-nums">{count} öğrenci</span>
+                              <span className="material-icons-outlined text-base">arrow_forward</span>
+                            </Link>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
                         </td>
                         <td className="table-td text-slate-500 text-xs">
                           {lastLog ? (
@@ -358,19 +381,21 @@ export function AdminConsultantsClient() {
                         </td>
                         <td className="table-td text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <Link
-                              href={`/admin/ogrenciler?consultantId=${c.id}`}
-                              className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                            >
-                              Öğrenciler
-                              <span className="material-icons-outlined text-base">arrow_forward</span>
-                            </Link>
+                            {c.role === "CONSULTANT" && (
+                              <Link
+                                href={`/admin/ogrenciler?consultantId=${c.id}`}
+                                className="text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                              >
+                                Öğrenciler
+                                <span className="material-icons-outlined text-base">arrow_forward</span>
+                              </Link>
+                            )}
                             <button
                               type="button"
                               onClick={() => handleDeleteConsultant(c)}
                               disabled={deletingId === c.id}
                               className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-500 hover:text-red-600 disabled:opacity-50"
-                              title="Danışmanı sil"
+                              title="Kullanıcıyı sil"
                             >
                               <span className="material-icons-outlined text-lg">delete</span>
                             </button>
@@ -462,7 +487,7 @@ export function AdminConsultantsClient() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="panel-card-inner w-full max-w-md p-6 shadow-2xl">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-5">
-              Yeni danışman
+              Yeni kullanıcı
             </h3>
             <form onSubmit={handleCreate} className="space-y-5">
               {error && (
@@ -470,6 +495,21 @@ export function AdminConsultantsClient() {
                   {error}
                 </p>
               )}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                  Rol *
+                </label>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  className="input-panel w-full"
+                >
+                  <option value="CONSULTANT">{ROLE_LABELS.CONSULTANT}</option>
+                  <option value="OPERATION_UNIVERSITY">{ROLE_LABELS.OPERATION_UNIVERSITY}</option>
+                  <option value="OPERATION_ACCOMMODATION">{ROLE_LABELS.OPERATION_ACCOMMODATION}</option>
+                  <option value="OPERATION_VISA">{ROLE_LABELS.OPERATION_VISA}</option>
+                </select>
+              </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Ad
@@ -532,6 +572,6 @@ export function AdminConsultantsClient() {
           </div>
         </div>
       )}
-    </div>
+    </PanelLayout>
   );
 }

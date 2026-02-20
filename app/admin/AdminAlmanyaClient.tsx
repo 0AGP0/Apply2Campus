@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
 
 const CSV_HEADER = "city,criteria,program,price3Weeks,price6Weeks,price12_16Weeks,price24Weeks,price32Weeks,passRate";
 
@@ -30,12 +30,11 @@ export function AdminAlmanyaClient() {
   }
 
   return (
-    <div className="panel-page max-w-4xl">
-      <PageHeader
-        title="Almanya teklif kataloğu"
-        subtitle="Sheets'ten export ettiğiniz CSV ile kataloğu güncelleyin. Danışmanlar teklif oluştururken bu veriyi kullanır."
-      />
-      <div className="mt-6 space-y-4">
+    <PanelLayout
+      title="Almanya teklif kataloğu"
+      subtitle="Sheets'ten export ettiğiniz CSV ile kataloğu güncelleyin. Danışmanlar teklif oluştururken bu veriyi kullanır."
+    >
+      <div className="mt-4 space-y-4">
         <div className="panel-card p-6">
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
             CSV sütunları (İngilizce): <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded">{CSV_HEADER}</code>
@@ -64,6 +63,6 @@ export function AdminAlmanyaClient() {
           </div>
         </div>
       </div>
-    </div>
+    </PanelLayout>
   );
 }

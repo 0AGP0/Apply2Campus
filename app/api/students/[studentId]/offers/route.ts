@@ -45,6 +45,9 @@ export async function GET(
         durationWeeks: i.durationWeeks,
         amount: Number(i.amount),
         currency: i.currency,
+        institutionId: i.institutionId,
+        startDate: i.startDate?.toISOString().slice(0, 10) ?? null,
+        endDate: i.endDate?.toISOString().slice(0, 10) ?? null,
       })),
     })),
   });
@@ -70,7 +73,18 @@ export async function POST(
     summary?: string;
     body?: string;
     status?: string;
-    items?: { city: string; schoolName: string; program: string; programGroup?: string; durationWeeks: number; amount: number; currency?: string }[];
+    items?: Array<{
+      city?: string;
+      schoolName?: string;
+      program?: string;
+      programGroup?: string;
+      durationWeeks?: number;
+      amount: number;
+      currency?: string;
+      institutionId?: string;
+      startDate?: string;
+      endDate?: string;
+    }>;
   };
 
   if (!title || typeof title !== "string" || !title.trim())
@@ -92,16 +106,27 @@ export async function POST(
       items:
         Array.isArray(items) && items.length > 0
           ? {
-              create: items.map((it: { city: string; schoolName: string; program: string; programGroup?: string; durationWeeks: number; amount: number; currency?: string }, idx: number) => ({
-                city: String(it.city),
-                schoolName: String(it.schoolName),
-                program: String(it.program),
-                programGroup: it.programGroup ?? null,
-                durationWeeks: Number(it.durationWeeks) || 0,
-                amount: Number(it.amount) || 0,
-                currency: it.currency ?? null,
-                sortOrder: idx,
-              })),
+              create: items.map((it, idx) => {
+                const institutionId = typeof it.institutionId === "string" ? it.institutionId.trim() || null : null;
+                const startDate = it.startDate ? new Date(it.startDate) : null;
+                const endDate = it.endDate ? new Date(it.endDate) : null;
+                const schoolName = typeof it.schoolName === "string" && it.schoolName.trim() ? it.schoolName.trim() : (institutionId ? "Kurum" : "—");
+                const program = typeof it.program === "string" && it.program.trim() ? it.program.trim() : (institutionId ? "Hizmet" : "—");
+                const city = typeof it.city === "string" && it.city.trim() ? it.city.trim() : schoolName;
+                return {
+                  city,
+                  schoolName,
+                  program,
+                  programGroup: typeof it.programGroup === "string" ? it.programGroup : null,
+                  durationWeeks: it.durationWeeks != null ? Number(it.durationWeeks) : null,
+                  amount: Number(it.amount) || 0,
+                  currency: typeof it.currency === "string" ? it.currency : null,
+                  institutionId,
+                  startDate: startDate && !isNaN(startDate.getTime()) ? startDate : null,
+                  endDate: endDate && !isNaN(endDate.getTime()) ? endDate : null,
+                  sortOrder: idx,
+                };
+              }),
             }
           : undefined,
     },

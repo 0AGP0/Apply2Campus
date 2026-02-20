@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
 import { DURATION_KEYS, CURRENCY_KEY, PROGRAM_GRUP_KEY } from "@/lib/catalog";
 
 const CSV_HEADER = "Ulke\tSehir\tOkul_Adi\tProgram\tProgram_Grup\tProgram_Adi\t2_Hafta\t8_Hafta\t12_Hafta\t16_Hafta\t24_Hafta\t32_Hafta\tPara_Birimi";
@@ -267,22 +267,20 @@ export function AdminCatalogClient() {
     "w-full min-w-0 px-2 py-1.5 text-sm rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none";
 
   return (
-    <div className="panel-page">
-      <PageHeader
-        title="Teklif kataloğu"
-        subtitle="Ülke seçerek katalogu filtreleyin veya CSV ile toplu içe aktarın. Sütunlar: Ulke, Sehir, Okul_Adi, Program, Program_Adi, 2_Hafta … 32_Hafta, Para_Birimi (tab veya virgül)."
-        actions={
-          <button
-            type="button"
-            onClick={addNewRow}
-            disabled={rows.some((r) => r.id === NEW_ROW_ID)}
-            className="px-4 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 disabled:opacity-50"
-          >
-            + Ürün ekle
-          </button>
-        }
-      />
-
+    <PanelLayout
+      title="Teklif kataloğu"
+      subtitle="Ülke seçerek katalogu filtreleyin veya CSV ile toplu içe aktarın. Sütunlar: Ulke, Sehir, Okul_Adi, Program, Program_Adi, 2_Hafta … 32_Hafta, Para_Birimi (tab veya virgül)."
+      actions={
+        <button
+          type="button"
+          onClick={addNewRow}
+          disabled={rows.some((r) => r.id === NEW_ROW_ID)}
+          className="px-4 py-2 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 disabled:opacity-50"
+        >
+          + Ürün ekle
+        </button>
+      }
+    >
       {error && (
         <div className="mt-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm">
           {error}
@@ -540,6 +538,6 @@ export function AdminCatalogClient() {
           </div>
         )}
       </div>
-    </div>
+    </PanelLayout>
   );
 }

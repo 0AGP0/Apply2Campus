@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
 
 type Stage = {
   id: string;
@@ -104,13 +104,11 @@ export function AdminStagesClient() {
   }
 
   return (
-    <div className="panel-page">
-      <PageHeader
-        title="Başvuru aşamaları"
-        subtitle="Danışmanların öğrencilere atadığı aşamaları buradan düzenleyin. Bir aşama silinirse, o aşamadaki öğrenciler otomatik olarak başka bir aşamaya taşınır."
-      />
-
-      <div className="panel-card p-4 sm:p-6 mb-6">
+    <PanelLayout
+      title="Başvuru aşamaları"
+      subtitle="Danışmanların öğrencilere atadığı aşamaları buradan düzenleyin. Bir aşama silinirse, o aşamadaki öğrenciler otomatik olarak başka bir aşamaya taşınır."
+    >
+      <div className="panel-card p-4 sm:p-6 mb-6 mt-4">
         <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Yeni aşama ekle</h3>
         <form onSubmit={addStage} className="flex flex-wrap items-end gap-4">
           <div className="flex-1 min-w-[120px]">
@@ -244,6 +242,6 @@ export function AdminStagesClient() {
           </div>
         </div>
       )}
-    </div>
+    </PanelLayout>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { SignOutModal } from "./SignOutModal";
+import { isOperationRole } from "@/lib/roles";
 
 export type AppSidebarUser = {
   name?: string | null;
@@ -54,6 +55,7 @@ function NavLink({
 
 export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: AppSidebarProps) {
   const isAdmin = user.role === "ADMIN";
+  const isOperation = isOperationRole(user.role);
   const [signOutOpen, setSignOutOpen] = useState(false);
 
   return (
@@ -74,7 +76,7 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
       )}
       <div className="p-4 lg:p-6 shrink-0">
         <Link
-          href={isAdmin ? "/admin" : "/students"}
+          href={isAdmin ? "/admin" : isOperation ? "/operasyon/inbox" : "/panel"}
           onClick={onNavigate}
           className="flex items-center gap-3 group"
         >
@@ -86,7 +88,7 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
               Apply2Campus
             </span>
             <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {isAdmin ? "Admin" : "Danışman"}
+              {isAdmin ? "Admin" : isOperation ? "Operasyon" : "Danışman"}
             </span>
           </div>
         </Link>
@@ -129,15 +131,83 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
               active={pathname === "/admin/katalog"}
               onNavigate={onNavigate}
             />
+            <NavLink
+              href="/admin/kurumlar"
+              label="Kurum Kartları"
+              icon="business"
+              active={pathname === "/admin/kurumlar"}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/admin/duyurular"
+              label="Duyurular"
+              icon="campaign"
+              active={pathname === "/admin/duyurular"}
+              onNavigate={onNavigate}
+            />
+          </>
+        ) : isOperation ? (
+          <>
+            <NavLink
+              href="/panel"
+              label="Ana Sayfa"
+              icon="dashboard"
+              active={pathname === "/panel"}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/students"
+              label="Öğrenci listesi"
+              icon="people_alt"
+              active={pathname === "/students" || !!pathname.match(/^\/students\/[^/]+$/)}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/operasyon/inbox"
+              label="Tek Inbox"
+              icon="inbox"
+              active={pathname === "/operasyon/inbox" || pathname.startsWith("/operasyon/inbox/")}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/panel/gorevler"
+              label="Görevler"
+              icon="assignment"
+              active={pathname === "/panel/gorevler"}
+              onNavigate={onNavigate}
+            />
           </>
         ) : (
-          <NavLink
-            href="/students"
-            label="Öğrenci listesi"
-            icon="people_alt"
-            active={pathname === "/students" || !!pathname.match(/^\/students\/[^/]+$/)}
-            onNavigate={onNavigate}
-          />
+          <>
+            <NavLink
+              href="/panel"
+              label="Ana Sayfa"
+              icon="dashboard"
+              active={pathname === "/panel"}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/students"
+              label="Öğrenci listesi"
+              icon="people_alt"
+              active={pathname === "/students" || !!pathname.match(/^\/students\/[^/]+$/)}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/panel/musait-saatler"
+              label="Müsait saatler"
+              icon="event"
+              active={pathname === "/panel/musait-saatler"}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/panel/gorevler"
+              label="Görevler"
+              icon="assignment"
+              active={pathname === "/panel/gorevler"}
+              onNavigate={onNavigate}
+            />
+          </>
         )}
       </nav>
       <div className="p-4 border-t border-slate-200 dark:border-slate-800 shrink-0">
@@ -152,7 +222,7 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
               {user.name ?? "Kullanıcı"}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-              {isAdmin ? "Yönetici" : "Danışman"}
+              {isAdmin ? "Yönetici" : isOperation ? "Operasyon" : "Danışman"}
             </p>
           </div>
         </div>

@@ -71,17 +71,28 @@ export async function PATCH(
   if (Array.isArray(items)) {
     await prisma.offerItem.deleteMany({ where: { offerId } });
     await prisma.offerItem.createMany({
-      data: items.map((it: { city: string; schoolName: string; program: string; programGroup?: string; durationWeeks: number; amount: number; currency?: string }, idx: number) => ({
-        offerId,
-        city: String(it.city),
-        schoolName: String(it.schoolName),
-        program: String(it.program),
-        programGroup: it.programGroup ?? null,
-        durationWeeks: Number(it.durationWeeks) || 0,
-        amount: Number(it.amount) || 0,
-        currency: it.currency ?? null,
-        sortOrder: idx,
-      })),
+      data: items.map((it: { city?: string; schoolName: string; program: string; programGroup?: string; durationWeeks?: number | null; amount: number; currency?: string; institutionId?: string; startDate?: string; endDate?: string }, idx: number) => {
+        const institutionId = typeof it.institutionId === "string" ? it.institutionId.trim() || null : null;
+        const startDate = it.startDate ? new Date(it.startDate) : null;
+        const endDate = it.endDate ? new Date(it.endDate) : null;
+        const city = typeof it.city === "string" && it.city.trim() ? it.city.trim() : it.schoolName || "—";
+        const schoolName = typeof it.schoolName === "string" && it.schoolName.trim() ? it.schoolName.trim() : "—";
+        const program = typeof it.program === "string" && it.program.trim() ? it.program.trim() : "—";
+        return {
+          offerId,
+          city,
+          schoolName,
+          program,
+          programGroup: it.programGroup ?? null,
+          durationWeeks: it.durationWeeks != null ? Number(it.durationWeeks) : null,
+          amount: Number(it.amount) || 0,
+          currency: it.currency ?? null,
+          institutionId,
+          startDate: startDate && !isNaN(startDate.getTime()) ? startDate : null,
+          endDate: endDate && !isNaN(endDate.getTime()) ? endDate : null,
+          sortOrder: idx,
+        };
+      }),
     });
   }
 

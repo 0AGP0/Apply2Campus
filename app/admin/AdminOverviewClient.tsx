@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
 
 type Stats = {
   totalStudents: number;
@@ -100,13 +100,11 @@ export function AdminOverviewClient() {
   const connectivityPercent = gmailTotal > 0 ? Math.round((connectedGmail / gmailTotal) * 100) : 0;
 
   return (
-    <div className="panel-page space-y-10">
-      <PageHeader
-        title="Özet"
-        subtitle="Genel istatistikler ve danışman verimliliği"
-      />
-
-      <section className="space-y-5 mt-6 sm:mt-8">
+    <PanelLayout
+      title="Özet"
+      subtitle="Genel istatistikler ve danışman verimliliği"
+    >
+      <section className="space-y-5 mt-4">
         <h2 className="panel-section-title flex items-center gap-2 pl-4 border-l-4 border-primary">
           Genel bilgiler
         </h2>
@@ -295,6 +293,6 @@ export function AdminOverviewClient() {
           </div>
         </aside>
       </div>
-    </div>
+    </PanelLayout>
   );
 }

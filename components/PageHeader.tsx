@@ -18,8 +18,7 @@ type PageHeaderProps = {
 };
 
 /**
- * Sayfa içeriğinin üstündeki başlık satırı. Tüm sayfalarda aynı yükseklik ve stil.
- * Logo/avatar burada değil; AppHeader'da.
+ * Sayfa içeriğinin üstündeki başlık satırı. Panel sayfalarında kullanılır.
  */
 export function PageHeader({
   backHref,
@@ -30,37 +29,50 @@ export function PageHeader({
   sticky = false,
   className = "",
 }: PageHeaderProps) {
+  const isCompact = className.includes("!px-0") || className.includes("px-0");
   return (
     <header
       className={`
-        bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800
-        px-4 sm:px-6 lg:px-8 py-3 sm:py-4
-        flex flex-row items-center gap-2 sm:gap-4 min-w-0
+        relative overflow-hidden
+        bg-white dark:bg-slate-900
+        border-b border-slate-200/90 dark:border-slate-700/90
+        shadow-sm
+        ${isCompact ? "px-0" : "px-3 sm:px-4 lg:px-5"}
+        py-4 sm:py-5
+        flex flex-row items-center gap-3 sm:gap-5 min-w-0
         ${sticky ? "sticky top-0 z-40" : ""}
         ${className}
       `}
     >
+      {/* Sol accent çizgisi */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-primary/70 dark:from-primary dark:to-primary/80"
+        aria-hidden
+      />
+
       {backHref != null && (
         <Link
           href={backHref}
-          className="p-2.5 -ml-1 sm:ml-0 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-all shrink-0 touch-manipulation"
+          className="relative z-10 flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-colors shrink-0 touch-manipulation"
           aria-label={backLabel}
         >
-          <span className="material-icons-outlined text-lg">arrow_back</span>
+          <span className="material-icons-outlined text-xl">arrow_back</span>
         </Link>
       )}
-      <div className="min-w-0 flex-1 overflow-hidden">
-        <h1 className="text-base sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white truncate leading-tight">
+
+      <div className="relative z-10 min-w-0 flex-1 overflow-hidden">
+        <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white truncate leading-tight">
           {title}
         </h1>
         {subtitle != null && (
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate max-w-xl">
             {subtitle}
           </p>
         )}
       </div>
+
       {actions != null && (
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+        <div className="relative z-10 flex items-center gap-2 shrink-0">
           {actions}
         </div>
       )}

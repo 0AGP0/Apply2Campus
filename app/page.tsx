@@ -8,7 +8,8 @@ export default async function Home() {
     const role = (session.user as { role?: string }).role ?? "CONSULTANT";
     if (role === "ADMIN") redirect("/admin");
     if (role === "STUDENT") redirect("/dashboard");
-    redirect("/students");
+    if (role === "OPERATION_UNIVERSITY" || role === "OPERATION_ACCOMMODATION" || role === "OPERATION_VISA") redirect("/operasyon/inbox");
+    redirect("/panel");
   }
 
   const features = [

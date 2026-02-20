@@ -52,6 +52,11 @@ export async function POST(
   const originalName = safeFilename(file.name, "dosya");
   const relativePath = saveDocument(buffer, studentId, fieldSlug, originalName, documentId);
 
+  const existingCount = await prisma.studentDocument.count({
+    where: { studentId, crmFieldId: crmField.id },
+  });
+  const version = existingCount + 1;
+
   const doc = await prisma.studentDocument.create({
     data: {
       studentId,
@@ -60,6 +65,7 @@ export async function POST(
       filePath: relativePath,
       mimeType: file.type || null,
       fileSize: file.size,
+      version,
     },
   });
 
@@ -68,5 +74,7 @@ export async function POST(
     fieldSlug,
     fileName: doc.fileName,
     uploadedAt: doc.uploadedAt,
+    version: doc.version,
+    status: doc.status,
   });
 }

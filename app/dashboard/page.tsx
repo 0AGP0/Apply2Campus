@@ -13,7 +13,10 @@ export default async function DashboardPage() {
   const [student, stages] = await Promise.all([
     prisma.student.findUnique({
       where: { id: studentId },
-      include: { gmailConnection: { select: { status: true, lastSyncAt: true } } },
+      include: {
+        gmailConnection: { select: { status: true, lastSyncAt: true } },
+        consultant: { select: { id: true, name: true, image: true } },
+      },
     }),
     prisma.stage.findMany({
       orderBy: { sortOrder: "asc" },
@@ -33,6 +36,7 @@ export default async function DashboardPage() {
           currentStageSlug={student.stage}
           stages={stages}
           gmailConnected={true}
+          consultant={student.consultant}
         />
       </div>
     );

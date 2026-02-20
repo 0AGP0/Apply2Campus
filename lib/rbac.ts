@@ -1,4 +1,7 @@
 import { prisma } from "./db";
+import { isOperationRole } from "./roles";
+
+export { isOperationRole } from "./roles";
 
 export async function canAccessStudent(
   userId: string,
@@ -6,7 +9,7 @@ export async function canAccessStudent(
   studentId: string,
   sessionStudentId?: string | null
 ): Promise<boolean> {
-  if (userRole === "ADMIN") return true;
+  if (userRole === "ADMIN" || isOperationRole(userRole)) return true;
   if (userRole === "STUDENT" && sessionStudentId) return sessionStudentId === studentId;
   const student = await prisma.student.findUnique({
     where: { id: studentId },
@@ -26,7 +29,7 @@ export async function getStudentsForUser(userId: string, role: string, sessionSt
     });
     return s ? [s] : [];
   }
-  if (role === "ADMIN") {
+  if (role === "ADMIN" || isOperationRole(role)) {
     return prisma.student.findMany({
       orderBy: { updatedAt: "desc" },
       include: {

@@ -11,11 +11,14 @@ export async function GET() {
   if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const users = await prisma.user.findMany({
-    where: { role: "CONSULTANT" },
+    where: {
+      role: { in: ["CONSULTANT", "OPERATION_UNIVERSITY", "OPERATION_ACCOMMODATION", "OPERATION_VISA"] },
+    },
     select: {
       id: true,
       name: true,
       email: true,
+      role: true,
       _count: { select: { assignedStudents: true } },
       assignedStudents: { select: { id: true, name: true } },
       auditLogs: {
@@ -40,15 +43,15 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const { name, email, password, role: newRole } = body;
-  const assignRole = newRole === "ADMIN" ? "ADMIN" : "CONSULTANT";
+  const allowedRoles = ["CONSULTANT", "OPERATION_UNIVERSITY", "OPERATION_ACCOMMODATION", "OPERATION_VISA"] as const;
+  const assignRole = allowedRoles.includes(newRole) ? newRole : "CONSULTANT";
   if (!email || typeof email !== "string") return NextResponse.json({ error: "Email required" }, { status: 400 });
   const trimmedEmail = email.trim().toLowerCase();
-  if (assignRole === "CONSULTANT" && password) {
+  if (password) {
     const pwdCheck = validatePassword(password);
     if (!pwdCheck.ok) return NextResponse.json({ error: pwdCheck.error }, { status: 400 });
   }
-  if (assignRole === "CONSULTANT" && !password)
-    return NextResponse.json({ error: "Danışman için şifre gerekli" }, { status: 400 });
+  if (!password) return NextResponse.json({ error: "Şifre gerekli" }, { status: 400 });
 
   const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
   if (existing) return NextResponse.json({ error: "Email already registered" }, { status: 400 });

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ComposeModal } from "@/components/ComposeModal";
 import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 type AttachmentMeta = {
@@ -28,6 +27,8 @@ type Message = {
 
 type StageItem = { slug: string; name: string };
 
+type InternalNote = { id: string; note: string; userName: string; createdAt: string };
+
 export function EmailDetailClient({
   studentId,
   studentStage,
@@ -35,6 +36,7 @@ export function EmailDetailClient({
   message,
   thread,
   stages,
+  canAddNotes = false,
 }: {
   studentId: string;
   studentStage: string;
@@ -42,10 +44,92 @@ export function EmailDetailClient({
   message: Message;
   thread: Message[];
   stages: StageItem[];
+  canAddNotes?: boolean;
 }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyBody, setReplyBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [notes, setNotes] = useState<InternalNote[]>([]);
+  const [noteText, setNoteText] = useState("");
+  const [addingNote, setAddingNote] = useState(false);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskAssigneeId, setTaskAssigneeId] = useState("");
+  const [taskAssignees, setTaskAssignees] = useState<{ id: string; name: string; roleLabel: string }[]>([]);
+  const [creatingTask, setCreatingTask] = useState(false);
+
+  const loadNotes = useCallback(async () => {
+    if (!canAddNotes) return;
+    const res = await fetch(`/api/students/${studentId}/emails/${message.gmailMessageId}/notes`);
+    const data = await res.json();
+    if (res.ok) setNotes(data.notes ?? []);
+  }, [canAddNotes, studentId, message.gmailMessageId]);
+
+  useEffect(() => {
+    loadNotes();
+  }, [loadNotes]);
+
+  const loadAssignees = useCallback(async () => {
+    const res = await fetch("/api/users/task-assignees");
+    const data = await res.json();
+    if (res.ok) setTaskAssignees(data.users ?? []);
+  }, []);
+
+  useEffect(() => {
+    if (taskModalOpen) {
+      loadAssignees();
+      setTaskTitle(message.subject?.trim() || "Mail ile ilgili görev");
+    }
+  }, [taskModalOpen, message.subject, loadAssignees]);
+
+  const addNote = async () => {
+    if (!noteText.trim()) return;
+    setAddingNote(true);
+    try {
+      const res = await fetch(`/api/students/${studentId}/emails/${message.gmailMessageId}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note: noteText.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setNotes((prev) => [...prev, data.note]);
+        setNoteText("");
+      } else alert(data.error ?? "Not eklenemedi");
+    } finally {
+      setAddingNote(false);
+    }
+  };
+
+  const createTaskFromMail = async () => {
+    if (!taskTitle.trim() || !taskAssigneeId) {
+      alert("Başlık ve atanacak kişi girin");
+      return;
+    }
+    setCreatingTask(true);
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: taskTitle.trim(),
+          description: `Mail: ${message.subject ?? ""} (${message.from ?? ""})`,
+          assignedToId: taskAssigneeId,
+          studentId,
+          relatedEmailId: message.id,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setTaskModalOpen(false);
+        setTaskTitle("");
+        setTaskAssigneeId("");
+        window.location.href = "/panel/gorevler";
+      } else alert(data.error ?? "Görev oluşturulamadı");
+    } finally {
+      setCreatingTask(false);
+    }
+  };
 
   async function sendReply() {
     if (!message.from) return;
@@ -174,6 +258,105 @@ export function EmailDetailClient({
                 )}
               </div>
             ))}
+
+            {canAddNotes && (
+              <div className="mt-8 sm:mt-12 p-4 sm:p-6 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/30">
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-white mb-3 flex items-center gap-2">
+                  <span className="material-icons-outlined text-primary">note</span>
+                  İç notlar ({notes.length})
+                </h3>
+                {notes.length > 0 && (
+                  <ul className="space-y-2 mb-4">
+                    {notes.map((n) => (
+                      <li key={n.id} className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <p className="text-sm text-slate-700 dark:text-slate-300">{n.note}</p>
+                        <p className="text-xs text-slate-500 mt-1">{n.userName} · {new Date(n.createdAt).toLocaleString("tr-TR")}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    placeholder="İç not ekle..."
+                    className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm focus:ring-2 focus:ring-primary/50"
+                    onKeyDown={(e) => e.key === "Enter" && addNote()}
+                  />
+                  <button
+                    type="button"
+                    onClick={addNote}
+                    disabled={addingNote || !noteText.trim()}
+                    className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {addingNote ? "Ekleniyor…" : "Ekle"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {canAddNotes && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => setTaskModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-primary/40 text-primary text-sm font-medium hover:bg-primary/10"
+                >
+                  <span className="material-icons-outlined text-lg">assignment</span>
+                  Bu mailden görev oluştur
+                </button>
+              </div>
+            )}
+
+            {taskModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60">
+                <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 shadow-xl">
+                  <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Mailden görev oluştur</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1">Başlık</label>
+                      <input
+                        type="text"
+                        value={taskTitle}
+                        onChange={(e) => setTaskTitle(e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-500 mb-1">Atanacak kişi *</label>
+                      <select
+                        value={taskAssigneeId}
+                        onChange={(e) => setTaskAssigneeId(e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm"
+                      >
+                        <option value="">Seçin</option>
+                        {taskAssignees.map((u) => (
+                          <option key={u.id} value={u.id}>{u.name} ({u.roleLabel})</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setTaskModalOpen(false)}
+                      className="flex-1 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium"
+                    >
+                      İptal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={createTaskFromMail}
+                      disabled={creatingTask || !taskAssigneeId}
+                      className="flex-1 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
+                    >
+                      {creatingTask ? "Oluşturuluyor…" : "Görev oluştur"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {!replyOpen ? (
               <div

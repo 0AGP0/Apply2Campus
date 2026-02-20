@@ -9,6 +9,7 @@ export default withAuth({
 export const config = {
   matcher: [
     "/students/:path*",
+    "/operasyon/:path*",
     "/admin/:path*",
     "/dashboard/:path*",
     "/api/badges",
@@ -17,6 +18,7 @@ export const config = {
     "/api/students/:studentId/send",
     "/api/students/:studentId/disconnect",
     "/api/students/:studentId/sync",
+    "/api/operasyon/:path*",
     "/api/oauth/gmail/start",
   ],
 };

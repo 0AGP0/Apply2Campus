@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { DURATION_OPTIONS } from "@/lib/catalog";
+import { getOfferStatusLabel } from "@/lib/offer-status";
 
 type OfferItem = {
   id: string;
@@ -8,9 +10,12 @@ type OfferItem = {
   schoolName: string;
   program: string;
   programGroup: string | null;
-  durationWeeks: number;
+  durationWeeks: number | null;
   amount: number;
   currency: string | null;
+  institutionId?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
 };
 
 type Offer = {
@@ -43,32 +48,16 @@ type EditableOfferItem = {
   schoolName: string;
   program: string;
   programGroup?: string;
-  durationWeeks: number;
+  durationWeeks?: number | null;
   amount: number;
   currency?: string;
+  startDate?: string | null;
+  endDate?: string | null;
 };
-
-const DURATIONS = [
-  { value: 2, label: "2 Hafta" },
-  { value: 8, label: "8 Hafta" },
-  { value: 12, label: "12 Hafta" },
-  { value: 16, label: "16 Hafta" },
-  { value: 24, label: "24 Hafta" },
-  { value: 32, label: "32 Hafta" },
-];
 
 function getAmount(row: CatalogRow, durationWeeks: number): number | null {
   return row.priceByDuration[String(durationWeeks)] ?? null;
 }
-
-const STATUS_LABEL: Record<string, string> = {
-  DRAFT: "Taslak",
-  SENT: "Gönderildi",
-  VIEWED: "Görüntülendi",
-  ACCEPTED: "Kabul edildi",
-  REJECTED: "Reddedildi",
-  REVISION_REQUESTED: "Revizyon istendi",
-};
 
 export function OfferDetailClient({
   studentId,
@@ -88,7 +77,7 @@ export function OfferDetailClient({
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20">
-            {STATUS_LABEL[offer.status] ?? offer.status}
+            {getOfferStatusLabel(offer.status)}
           </span>
           {offer.sentAt && (
             <span className="text-sm text-slate-500">Gönderilme: {new Date(offer.sentAt).toLocaleDateString("tr-TR")}</span>
@@ -103,7 +92,11 @@ export function OfferDetailClient({
             <ul className="space-y-2">
               {offer.items.map((i) => (
                 <li key={i.id} className="flex justify-between items-center text-sm py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                  <span>{i.city} · {i.schoolName}{i.programGroup ? ` · ${i.programGroup}` : ""} · {i.program} ({i.durationWeeks} hafta)</span>
+                  <span>
+                    {i.startDate && i.endDate
+                      ? `${i.schoolName} · ${i.program} · ${i.startDate}–${i.endDate}`
+                      : `${i.city} · ${i.schoolName}${i.programGroup ? ` · ${i.programGroup}` : ""} · ${i.program} (${i.durationWeeks ?? 0} hafta)`}
+                  </span>
                   <span className="font-semibold text-slate-900 dark:text-white">{i.amount} {i.currency ?? "€"}</span>
                 </li>
               ))}
@@ -257,9 +250,11 @@ function EditOfferModal({
       schoolName: i.schoolName,
       program: i.program,
       programGroup: i.programGroup ?? undefined,
-      durationWeeks: i.durationWeeks,
+      durationWeeks: i.durationWeeks ?? null,
       amount: i.amount,
       currency: i.currency ?? undefined,
+      startDate: i.startDate ?? null,
+      endDate: i.endDate ?? null,
     }))
   );
   const [saving, setSaving] = useState(false);
@@ -415,7 +410,7 @@ function EditOfferModal({
                     onChange={(e) => setSelectedDuration(Number(e.target.value))}
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800"
                   >
-                    {DURATIONS.map((d) => (
+                    {DURATION_OPTIONS.map((d) => (
                       <option key={d.value} value={d.value}>{d.label}</option>
                     ))}
                   </select>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignOutModal } from "@/components/SignOutModal";
+import { StudentGlobalBar } from "./StudentGlobalBar";
 
 type Student = {
   id: string;
@@ -48,9 +49,29 @@ export function StudentDashboardLayout({
           <span className="material-icons-outlined text-xl">home</span>
           <span className="font-medium text-sm">Ana Sayfa</span>
         </Link>
+        <Link href="/dashboard/profilim" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname?.startsWith("/dashboard/profilim") ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">person</span>
+          <span className="font-medium text-sm">Profilim</span>
+        </Link>
+        <Link href="/dashboard/basvurularim" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/basvurularim" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">assignment</span>
+          <span className="font-medium text-sm">Başvurularım</span>
+        </Link>
         <Link href="/dashboard/offers" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname?.startsWith("/dashboard/offers") ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
           <span className="material-icons-outlined text-xl">description</span>
           <span className="font-medium text-sm">Teklifler</span>
+        </Link>
+        <Link href="/dashboard/dokumanlar" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/dokumanlar" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">folder</span>
+          <span className="font-medium text-sm">Dökümanlar</span>
+        </Link>
+        <Link href="/dashboard/vize" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/vize" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">badge</span>
+          <span className="font-medium text-sm">Vize Bilgileri</span>
+        </Link>
+        <Link href="/dashboard/videolar" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/videolar" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">play_circle</span>
+          <span className="font-medium text-sm">Eğitim Videoları</span>
         </Link>
         <Link href="/dashboard/settings" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/settings" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
           <span className="material-icons-outlined text-xl">settings</span>
@@ -95,9 +116,7 @@ export function StudentDashboardLayout({
           </div>
           <span className="font-bold text-lg tracking-tight text-slate-800 dark:text-white truncate">Apply2Campus</span>
         </Link>
-        <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center border border-primary/20 shrink-0">
-          <span className="text-xs font-bold text-primary">{user.name?.slice(0, 2).toUpperCase() ?? "U"}</span>
-        </div>
+        <StudentGlobalBar user={user} student={student} onSignOutClick={() => setSignOutOpen(true)} compact />
       </div>
 
       {mobileMenuOpen && (
@@ -117,9 +136,14 @@ export function StudentDashboardLayout({
         </>
       )}
 
-      <main className="flex-1 min-h-0 min-w-0 flex flex-col overflow-y-auto pt-14 lg:pt-0">
-        {children}
-      </main>
+      <div className="flex-1 min-h-0 min-w-0 flex flex-col pt-14 lg:pt-0">
+        <div className="hidden lg:block">
+          <StudentGlobalBar user={user} student={student} onSignOutClick={() => setSignOutOpen(true)} />
+        </div>
+        <main className="flex-1 min-h-0 min-w-0 overflow-y-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

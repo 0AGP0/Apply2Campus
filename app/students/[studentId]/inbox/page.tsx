@@ -2,7 +2,6 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import Link from "next/link";
 import { InboxClient } from "./InboxClient";
 
 export default async function InboxPage({

@@ -29,7 +29,12 @@ export default async function OfferDetailPage({
   });
   if (!offer) notFound();
 
-  const items = offer.items.map((i) => ({ ...i, amount: Number(i.amount) }));
+  const items = offer.items.map((i) => ({
+    ...i,
+    amount: Number(i.amount),
+    startDate: i.startDate?.toISOString().slice(0, 10) ?? null,
+    endDate: i.endDate?.toISOString().slice(0, 10) ?? null,
+  }));
   const offerForClient = {
     ...offer,
     items,

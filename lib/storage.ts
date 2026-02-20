@@ -46,6 +46,27 @@ export function documentExists(relativePath: string): boolean {
 }
 
 /**
+ * Kurum galeri görseli veya katalog PDF yazar.
+ * Path: data/uploads/institutions/{institutionId}/{subfolder}/{id}_{filename}
+ * @returns DB'de saklanacak relative path
+ */
+export function saveInstitutionFile(
+  buffer: Buffer,
+  institutionId: string,
+  subfolder: "gallery" | "catalog",
+  originalFilename: string,
+  fileId: string
+): string {
+  const dir = path.join(UPLOAD_BASE, "institutions", institutionId, subfolder);
+  fs.mkdirSync(dir, { recursive: true });
+  const base = safeBasename(originalFilename);
+  const filename = subfolder === "catalog" ? `catalog_${fileId}.pdf` : `${fileId}_${base}`;
+  const fullPath = path.join(dir, filename);
+  fs.writeFileSync(fullPath, buffer);
+  return path.join("institutions", institutionId, subfolder, filename).replace(/\\/g, "/");
+}
+
+/**
  * Dosyayı stream olarak okur (indirme API için).
  */
 export function createReadStream(relativePath: string): fs.ReadStream {

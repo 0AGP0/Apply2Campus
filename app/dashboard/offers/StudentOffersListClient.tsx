@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getOfferStatusLabel, ACTIVE_OFFER_STATUSES } from "@/lib/offer-status";
 
 type Offer = {
   id: string;
@@ -16,17 +17,6 @@ type Offer = {
   totalAmount: number;
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  DRAFT: "Taslak",
-  SENT: "Gönderildi",
-  VIEWED: "Görüntülendi",
-  ACCEPTED: "Kabul edildi",
-  REJECTED: "Reddedildi",
-  REVISION_REQUESTED: "Revizyon istendi",
-};
-
-const ACTIVE_STATUSES = ["DRAFT", "SENT", "VIEWED", "REVISION_REQUESTED"];
-
 function OfferCard({ o }: { o: Offer }) {
   return (
     <li className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4 hover:border-primary/30 transition-colors">
@@ -34,7 +24,7 @@ function OfferCard({ o }: { o: Offer }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="font-medium text-slate-900 dark:text-slate-100">{o.title}</p>
           <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-            {STATUS_LABEL[o.status] ?? o.status}
+            {getOfferStatusLabel(o.status)}
           </span>
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-xs text-slate-500">
@@ -59,8 +49,8 @@ export function StudentOffersListClient() {
       .finally(() => setLoading(false));
   }, []);
 
-  const activeOffers = offers.filter((o) => ACTIVE_STATUSES.includes(o.status));
-  const pastOffers = offers.filter((o) => !ACTIVE_STATUSES.includes(o.status));
+  const activeOffers = offers.filter((o) => (ACTIVE_OFFER_STATUSES as readonly string[]).includes(o.status));
+  const pastOffers = offers.filter((o) => !(ACTIVE_OFFER_STATUSES as readonly string[]).includes(o.status));
 
   if (loading) return <p className="text-slate-500 text-sm">Yükleniyor…</p>;
 

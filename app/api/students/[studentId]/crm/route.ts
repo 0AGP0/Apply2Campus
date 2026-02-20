@@ -4,7 +4,7 @@ import { canAccessStudent } from "@/lib/rbac";
 import { prisma } from "@/lib/db";
 
 type ValueRow = { value: string; updatedAt: Date; crmField: { slug: string; label: string; type: string } };
-type DocRow = { id: string; fileName: string; fileSize: number | null; uploadedAt: Date; crmField: { slug: string; label: string } };
+type DocRow = { id: string; fileName: string; fileSize: number | null; uploadedAt: Date; version: number; status: string; crmField: { slug: string; label: string } };
 
 /** Öğrencinin CRM değerleri ve belge listesi. Yetkili kullanıcı (danışman/admin/öğrenci kendisi). */
 export async function GET(
@@ -27,7 +27,7 @@ export async function GET(
     (prisma as unknown as { studentDocument: { findMany: (args: unknown) => Promise<DocRow[]> } }).studentDocument.findMany({
       where: { studentId },
       include: { crmField: { select: { slug: true, label: true, allowMultiple: true } } },
-      orderBy: { uploadedAt: "asc" },
+      orderBy: [{ crmFieldId: "asc" }, { version: "desc" }],
     }),
   ]);
 
@@ -46,6 +46,8 @@ export async function GET(
       fileName: d.fileName,
       fileSize: d.fileSize,
       uploadedAt: d.uploadedAt,
+      version: d.version,
+      status: d.status,
     })),
   });
 }
