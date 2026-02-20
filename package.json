@@ -15,6 +15,7 @@
     "db:seed-crm": "tsx prisma/seed-crm.ts",
     "db:seed-document-categories": "tsx prisma/seed-document-categories.ts",
     "db:seed-demo-users": "tsx prisma/seed-demo-users.ts",
+    "db:fix-production": "tsx prisma/seed-demo-users.ts && tsx prisma/seed-crm.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
