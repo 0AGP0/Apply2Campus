@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 
 type Notification = {
@@ -13,10 +13,25 @@ type Notification = {
   createdAt: string;
 };
 
-export function ConsultantNotifications() {
+type ConsultantNotificationsProps = {
+  /** Kompakt mod: sadece ikon (üst bar için) */
+  compact?: boolean;
+};
+
+export function ConsultantNotifications({ compact = false }: ConsultantNotificationsProps) {
   const [list, setList] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!compact) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [compact]);
 
   const fetchList = () => {
     fetch("/api/notifications")
@@ -60,21 +75,27 @@ export function ConsultantNotifications() {
     return d.toLocaleDateString("tr-TR");
   }
 
-  if (loading && list.length === 0) return null;
+  if (loading && list.length === 0 && !compact) return null;
 
   return (
-    <div className="relative">
+    <div className="relative" ref={compact ? ref : undefined}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+        className={`flex items-center gap-2 rounded-xl transition-colors ${
+          compact
+            ? "p-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 relative"
+            : "px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800/50"
+        }`}
         aria-expanded={open}
         aria-label="Bildirimler"
       >
-        <span className="material-icons-outlined text-slate-600 dark:text-slate-400">notifications</span>
-        <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Bildirimler</span>
+        <span className="material-icons-outlined text-xl">notifications</span>
+        {!compact && <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Bildirimler</span>}
         {unreadCount > 0 && (
-          <span className="min-w-[1.25rem] h-5 px-1.5 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+          <span className={`rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center ${
+            compact ? "absolute top-1.5 right-1.5 min-w-[1.25rem] h-5 px-1" : "min-w-[1.25rem] h-5 px-1.5"
+          }`}>
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}

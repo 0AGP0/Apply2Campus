@@ -9,7 +9,15 @@ type DocItem = { id: string; fieldSlug: string; categorySlug?: string; fileName:
 type Category = { id: string; slug: string; name: string; type: string };
 type DocByCat = { id: string; categorySlug: string; categoryName: string; categoryType: string; fileName: string; version: number; status: string; uploadedAt: string };
 
+const TAB_LABELS = ["Kişisel Belgeler", "Operasyon Belgeleri"];
+
+/**
+ * Öğrenci Dökümanlar sayfası – Revize.txt 3.4 uyarınca:
+ * 3.5.1 Kişisel Belgeler (CRM FILE + Öğrenci evrak kategorileri tek sekmede)
+ * 3.5.2 Belgeler – Operasyonun yüklediği (öğrenci sadece görüntüler)
+ */
 export function DokumanlarClient({ studentId }: { studentId: string }) {
+  const [activeTab, setActiveTab] = useState(0);
   const [sections, setSections] = useState<Section[]>([]);
   const [documents, setDocuments] = useState<DocItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -17,26 +25,24 @@ export function DokumanlarClient({ studentId }: { studentId: string }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [activeGroup, setActiveGroup] = useState<"kisisel" | "operasyon" | "evrak">("kisisel");
 
   const load = useCallback(async () => {
-    const [formRes, dataRes, catRes, docCatRes] = await Promise.all([
+    const [formRes, crmRes, catRes, docCatRes] = await Promise.all([
       fetch("/api/crm/form"),
       fetch(`/api/students/${studentId}/crm`),
       fetch("/api/document-categories"),
       fetch(`/api/students/${studentId}/documents-by-category`),
     ]);
-    if (!formRes.ok || !dataRes.ok) {
+    if (!formRes.ok || !crmRes.ok) {
       setError("Veriler yüklenemedi");
       setLoading(false);
       return;
     }
     const formJson = await formRes.json();
-    const dataJson = await dataRes.json();
+    const crmJson = await crmRes.json();
     const all = (formJson.sections ?? []) as Section[];
-    const docSection = all.find((s: Section) => s.slug === "documents");
-    setSections(docSection ? [docSection] : []);
-    setDocuments(dataJson.documents ?? []);
+    setSections(all);
+    setDocuments(crmJson.documents ?? []);
     if (catRes.ok) {
       const catJson = await catRes.json();
       setCategories(catJson.categories ?? []);
@@ -97,7 +103,11 @@ export function DokumanlarClient({ studentId }: { studentId: string }) {
     );
   }
 
-  const fileFields = sections.flatMap((s) => s.fields).filter((f) => f.type === "FILE");
+  const docSection = sections.find((s) => s.slug === "documents");
+  const fileFields = (docSection?.fields ?? []).filter((f) => f.type === "FILE");
+  const fallbackFileFields = sections.flatMap((s) => s.fields).filter((f) => f.type === "FILE");
+  const fieldsToShow = fileFields.length > 0 ? fileFields : fallbackFileFields;
+
   const operationCategories = categories.filter((c) => c.type === "OPERATION_UPLOADED");
   const studentUploadCategories = categories.filter((c) => c.type === "STUDENT_UPLOADED");
   const docsByCategorySlug = documentsByCat.reduce((acc, d) => {
@@ -111,197 +121,169 @@ export function DokumanlarClient({ studentId }: { studentId: string }) {
     ...documentsByCat.filter((d) => d.status === "REVISION_REQUESTED").map((d) => ({ ...d, fieldSlug: "" })),
   ];
 
-  const NavItem = ({ id, icon, label }: { id: typeof activeGroup; icon: string; label: string }) => (
-    <button
-      type="button"
-      onClick={() => setActiveGroup(id)}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
-        activeGroup === id
-          ? "bg-primary/10 text-primary shadow-sm"
-          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60"
-      }`}
-    >
-      <span className="material-icons-outlined text-xl">{icon}</span>
-      <span className="font-medium text-sm">{label}</span>
-    </button>
-  );
-
-  const DocItem = ({ d, href }: { d: { fileName: string; version: number; status: string; uploadedAt: string }; href: string }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-    >
-      <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-primary/10">
-        <span className="material-icons-outlined text-slate-500 group-hover:text-primary text-xl">description</span>
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">{d.fileName}</p>
-        <p className="text-xs text-slate-500 mt-0.5">
-          v{d.version} · {new Date(d.uploadedAt).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })}
-        </p>
-      </div>
-      <span className={`shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-lg ${getDocumentStatusBadgeClass(d.status)}`}>
-        {getDocumentStatusLabel(d.status)}
-      </span>
+  const DocRow = ({ d, href }: { d: { fileName: string; version: number; status: string; uploadedAt: string }; href: string }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 group">
+      <span className="material-icons-outlined text-slate-400 group-hover:text-primary text-lg">description</span>
+      <span className="text-sm text-slate-800 dark:text-slate-200 truncate flex-1">{d.fileName}</span>
+      <span className="text-xs text-slate-500">v{d.version}</span>
+      <span className="text-xs text-slate-500">{new Date(d.uploadedAt).toLocaleDateString("tr-TR")}</span>
+      <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${getDocumentStatusBadgeClass(d.status)}`}>{getDocumentStatusLabel(d.status)}</span>
     </a>
   );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
-      {/* Sol navigasyon */}
-      <aside className="lg:w-56 shrink-0">
-        <nav className="sticky top-4 space-y-1 p-2 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-          <NavItem id="kisisel" icon="folder_open" label="Kişisel Belgeler" />
-          <NavItem id="operasyon" icon="business_center" label="Operasyon Belgeleri" />
-          <NavItem id="evrak" icon="upload_file" label="Evrak Yükle" />
-        </nav>
-      </aside>
+    <div className="space-y-6">
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 text-sm">
+          {error}
+        </div>
+      )}
 
-      {/* Ana içerik */}
-      <div className="flex-1 min-w-0 space-y-6">
-        {error && (
-          <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 text-sm">
-            {error}
-          </div>
-        )}
+      {/* Revize bekleyen – Revize 3.5.1: versiyonlama + durum */}
+      {revizeDocs.length > 0 && (
+        <section className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50">
+          <h2 className="text-sm font-semibold text-amber-800 dark:text-amber-200 flex items-center gap-2 mb-2">
+            <span className="material-icons-outlined text-lg">warning</span>
+            Revize bekleyen belgeler ({revizeDocs.length})
+          </h2>
+          <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">Aşağıdaki belgeleri güncelleyip tekrar yükleyin.</p>
+          <ul className="space-y-1">
+            {revizeDocs.map((d) => (
+              <li key={d.id}>
+                <a
+                  href={d.categorySlug ? `/api/students/${studentId}/documents-by-category/${d.id}` : `/api/students/${studentId}/documents/${d.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-amber-800 dark:text-amber-200 hover:underline"
+                >
+                  {d.fileName}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-        {/* Revize uyarısı */}
-        {revizeDocs.length > 0 && (
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200/80 dark:border-amber-800/50">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
-              <span className="material-icons-outlined text-amber-600 dark:text-amber-400 text-2xl">info</span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-amber-900 dark:text-amber-100">{revizeDocs.length} belge revize bekliyor</p>
-              <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">Bu belgeleri güncelleyip tekrar yükleyin</p>
-            </div>
-            <details className="shrink-0">
-              <summary className="text-sm font-medium text-amber-700 dark:text-amber-300 cursor-pointer hover:underline">Listele</summary>
-              <ul className="mt-2 space-y-1 max-h-32 overflow-y-auto">
-                {revizeDocs.map((d) => (
-                  <li key={d.id}>
-                    <a
-                      href={d.categorySlug ? `/api/students/${studentId}/documents-by-category/${d.id}` : `/api/students/${studentId}/documents/${d.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-amber-800 dark:text-amber-200 hover:underline truncate block"
-                    >
-                      {d.fileName}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </div>
-        )}
+      {/* Sekmeler – Profilim ile aynı görsel dil */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+        <div className="flex flex-wrap gap-1 border-b border-slate-200 dark:border-slate-700 px-4 pt-4">
+          {TAB_LABELS.map((label, i) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => setActiveTab(i)}
+              className={`px-4 py-3 text-sm font-medium rounded-t-xl transition-colors ${
+                activeTab === i
+                  ? "text-primary bg-white dark:bg-slate-900 -mb-px border border-slate-200 dark:border-slate-700 border-b-2 border-b-primary"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
-        {/* Kişisel Belgeler */}
-        {activeGroup === "kisisel" && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Kişisel Belgeler ve Tercümeler</h2>
-            <div className="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900/50 overflow-hidden shadow-sm">
-              {fileFields.length === 0 ? (
-                <div className="p-12 text-center text-slate-500 text-sm">Henüz alan tanımlanmamış</div>
-              ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                  {fileFields.map((field) => {
-                    const docs = documents.filter((d) => d.fieldSlug === field.slug);
-                    const isUploading = uploading === field.slug;
-                    return (
-                      <div key={field.id} className="p-4">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{field.label}</h3>
-                          <input type="file" accept=".pdf,.doc,.docx,image/*" className="hidden" id={`file-${field.slug}`} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadCrm(field.slug, f); e.target.value = ""; }} disabled={!!isUploading} />
-                          <label htmlFor={`file-${field.slug}`} className="text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium hover:bg-primary/20 cursor-pointer shrink-0 transition-colors">
-                            {isUploading ? "Yükleniyor..." : "Yükle"}
-                          </label>
-                        </div>
-                        {docs.length === 0 ? (
-                          <p className="text-xs text-slate-500 italic">Yüklenmedi</p>
-                        ) : (
-                          <div className="space-y-1">
-                            {docs.map((d) => <DocItem key={d.id} d={{ ...d, version: d.version ?? 1, status: d.status ?? "UPLOADED" }} href={`/api/students/${studentId}/documents/${d.id}`} />)}
-                          </div>
-                        )}
+        <div className="p-6 sm:p-8">
+          {/* 3.5.1 Kişisel Belgeler – CRM + Öğrenci evrak kategorileri */}
+          {activeTab === 0 && (
+      <section className="space-y-6">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Kişisel Belgeler ve tercümeler</h2>
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 divide-y divide-slate-100 dark:divide-slate-800">
+            {fieldsToShow.length === 0 ? (
+              <div className="p-6 text-center text-slate-500 text-sm">
+                Belge alanları tanımlı değil. Veritabanı seed&apos;lerinin çalıştırıldığından emin olun: <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1 rounded">db:seed</code>
+              </div>
+            ) : (
+              fieldsToShow.map((field) => {
+                const docs = documents.filter((d) => d.fieldSlug === field.slug);
+                const isUploading = uploading === field.slug;
+                return (
+                  <div key={field.id} className="p-4">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">{field.label}</h3>
+                      <input type="file" accept=".pdf,.doc,.docx,image/*" className="hidden" id={`file-${field.slug}`} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadCrm(field.slug, f); e.target.value = ""; }} disabled={!!isUploading} />
+                      <label htmlFor={`file-${field.slug}`} className="text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium hover:bg-primary/20 cursor-pointer shrink-0">
+                        {isUploading ? "Yükleniyor..." : "Yükle"}
+                      </label>
+                    </div>
+                    {docs.length === 0 ? (
+                      <p className="text-xs text-slate-500 italic">Henüz yüklenmedi</p>
+                    ) : (
+                      <div className="space-y-1 mt-2">
+                        {docs.map((d) => <DocRow key={d.id} d={{ ...d, version: d.version ?? 1, status: d.status ?? "UPLOADED" }} href={`/api/students/${studentId}/documents/${d.id}`} />)}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
-        )}
-
-        {/* Operasyon Belgeleri */}
-        {activeGroup === "operasyon" && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Operasyon Belgeleri</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Operasyon ve danışman tarafından yüklenen belgeler</p>
-            <div className="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900/50 overflow-hidden shadow-sm">
-              {operationCategories.length === 0 ? (
-                <div className="p-12 text-center text-slate-500 text-sm">Kategori tanımlı değil</div>
-              ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                  {operationCategories.map((cat) => {
-                    const docs = docsByCategorySlug[cat.slug] ?? [];
-                    return (
-                      <div key={cat.id} className="p-4">
-                        <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{cat.name}</h3>
-                        {docs.length === 0 ? (
-                          <p className="text-xs text-slate-500 italic">Yüklenmedi</p>
-                        ) : (
-                          <div className="space-y-1">
-                            {docs.map((d) => <DocItem key={d.id} d={d} href={`/api/students/${studentId}/documents-by-category/${d.id}`} />)}
-                          </div>
-                        )}
+        </div>
+        {/* Öğrenci evrak kategorileri – Danışmanlık, Kimlik, Taksit vb. */}
+        {studentUploadCategories.length > 0 && (
+          <div>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Sözleşme ve Ödeme Belgeleri</h2>
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 divide-y divide-slate-100 dark:divide-slate-800">
+              {studentUploadCategories.map((cat) => {
+                const docs = docsByCategorySlug[cat.slug] ?? [];
+                const isUploading = uploading === cat.slug;
+                return (
+                  <div key={cat.id} className="p-4">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">{cat.name}</h3>
+                      <input type="file" accept=".pdf,.doc,.docx,image/*" className="hidden" id={`cat-${cat.slug}`} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadByCategory(cat.slug, f); e.target.value = ""; }} disabled={!!isUploading} />
+                      <label htmlFor={`cat-${cat.slug}`} className="text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium hover:bg-primary/20 cursor-pointer shrink-0">
+                        {isUploading ? "Yükleniyor..." : "Yükle"}
+                      </label>
+                    </div>
+                    {docs.length === 0 ? (
+                      <p className="text-xs text-slate-500 italic">Henüz yüklenmedi</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {docs.map((d) => <DocRow key={d.id} d={d} href={`/api/students/${studentId}/documents-by-category/${d.id}`} />)}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
+      </section>
+          )}
 
-        {/* Evrak Yükle */}
-        {activeGroup === "evrak" && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Evrak Yükle</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Aşağıdaki kategorilerden dosya yükleyebilirsiniz</p>
-            <div className="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900/50 overflow-hidden shadow-sm">
-              {studentUploadCategories.length === 0 ? (
-                <div className="p-12 text-center text-slate-500 text-sm">Kategori tanımlı değil</div>
-              ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                  {studentUploadCategories.map((cat) => {
-                    const docs = docsByCategorySlug[cat.slug] ?? [];
-                    const isUploading = uploading === cat.slug;
-                    return (
-                      <div key={cat.id} className="p-4">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{cat.name}</h3>
-                          <input type="file" accept=".pdf,.doc,.docx,image/*" className="hidden" id={`cat-${cat.slug}`} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadByCategory(cat.slug, f); e.target.value = ""; }} disabled={!!isUploading} />
-                          <label htmlFor={`cat-${cat.slug}`} className="text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium hover:bg-primary/20 cursor-pointer shrink-0 transition-colors">
-                            {isUploading ? "Yükleniyor..." : "Yükle"}
-                          </label>
-                        </div>
-                        {docs.length === 0 ? (
-                          <p className="text-xs text-slate-500 italic">Yüklenmedi</p>
-                        ) : (
-                          <div className="space-y-1">
-                            {docs.map((d) => <DocItem key={d.id} d={d} href={`/api/students/${studentId}/documents-by-category/${d.id}`} />)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+          {/* 3.5.2 Belgeler – Operasyonun yüklediği (öğrenci sadece görüntüler) – Revize */}
+          {activeTab === 1 && (
+      <section>
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-2">Belgeler (Operasyonun yüklediği)</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Bu belgeler operasyon/danışman tarafından yüklenir. Görüntüleyip indirebilirsiniz.</p>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 divide-y divide-slate-100 dark:divide-slate-800">
+          {operationCategories.length === 0 ? (
+            <div className="p-6 text-center text-slate-500 text-sm">
+              Belge kategorileri tanımlı değil. <code className="text-xs bg-slate-100 dark:bg-slate-800 px-1 rounded">db:seed-document-categories</code> çalıştırın.
             </div>
-          </div>
-        )}
+          ) : (
+            operationCategories.map((cat) => {
+              const docs = docsByCategorySlug[cat.slug] ?? [];
+              return (
+                <div key={cat.id} className="p-4">
+                  <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">{cat.name}</h3>
+                  {docs.length === 0 ? (
+                    <p className="text-xs text-slate-500 italic">Henüz yüklenmedi</p>
+                  ) : (
+                    <div className="space-y-1">
+                      {docs.map((d) => <DocRow key={d.id} d={d} href={`/api/students/${studentId}/documents-by-category/${d.id}`} />)}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </section>
+          )}
+        </div>
       </div>
     </div>
   );

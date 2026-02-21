@@ -2,8 +2,8 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { PanelLayout } from "@/components/PanelLayout";
 import { EmailDetailClient } from "./EmailDetailClient";
-import { PageHeader } from "@/components/PageHeader";
 
 export default async function EmailDetailPage({
   params,
@@ -43,12 +43,13 @@ export default async function EmailDetailPage({
   const subject = message.subject?.trim() || "(Konu yok)";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <PageHeader
-        backHref={`/students/${studentId}/inbox`}
-        backLabel="Gelen kutusuna dön"
-        title={subject}
-      />
+    <PanelLayout
+      backHref={`/students/${studentId}/inbox`}
+      backLabel="Gelen kutusuna dön"
+      title={subject}
+      subtitle="Mail detayı"
+      sticky
+    >
       <EmailDetailClient
         studentId={studentId}
         studentStage={student.stage}
@@ -58,6 +59,6 @@ export default async function EmailDetailPage({
         stages={stages}
         canAddNotes={role !== "STUDENT"}
       />
-    </div>
+    </PanelLayout>
   );
 }

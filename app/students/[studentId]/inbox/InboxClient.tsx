@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ComposeModal } from "@/components/ComposeModal";
-import { PageHeader } from "@/components/PageHeader";
 import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -492,16 +491,17 @@ export function InboxClient({
   );
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <PageHeader
-        backHref={backHref ?? (inboxBasePath ? basePath : `/students/${studentId}`)}
-        backLabel={backLabel ?? (inboxBasePath ? "Panele dön" : "Öğrenciye dön")}
-        title={label === "SENT" ? "Gönderilen" : "Gelen kutusu"}
-        actions={inboxActions}
-      />
-
-      {/* Mobil: Gelen kutusu | Gönderilen sekmeleri */}
-      <div className="md:hidden flex border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+    <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+      {/* Üst bar: mobil tabs + aksiyonlar (layout header zaten layout tarafından sağlanıyor) */}
+      <div className="shrink-0 flex flex-col border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2">
+          <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
+            {label === "SENT" ? "Gönderilen" : "Gelen kutusu"}
+          </div>
+          {inboxActions}
+        </div>
+        {/* Mobil: Gelen kutusu | Gönderilen sekmeleri */}
+        <div className="md:hidden flex">
         <Link
           href={`${basePath}/inbox`}
           className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${label === "INBOX" && !folderId ? "text-primary border-b-2 border-primary" : "text-slate-500 dark:text-slate-400"}`}
@@ -514,6 +514,7 @@ export function InboxClient({
         >
           Gönderilen
         </Link>
+        </div>
       </div>
 
       <main className="flex-1 min-h-0 flex overflow-hidden">

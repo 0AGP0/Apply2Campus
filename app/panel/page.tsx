@@ -2,7 +2,6 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { getStudentsForUser } from "@/lib/rbac";
 import { PanelLayout } from "@/components/PanelLayout";
 import { InfoCard } from "@/components/InfoCard";
-import { ConsultantNotifications } from "@/components/ConsultantNotifications";
 import { isOperationRole } from "@/lib/roles";
 import Link from "next/link";
 
@@ -31,9 +30,7 @@ export default async function PanelPage() {
             <span className="material-icons-outlined text-lg">inbox</span>
             Tek Inbox
           </Link>
-        ) : (
-          <ConsultantNotifications />
-        )
+        ) : null
       }
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 mb-6">

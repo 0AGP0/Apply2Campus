@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { AppSidebarUser } from "./AppSidebar";
 import { isOperationRole } from "@/lib/roles";
+import { AppGlobalBar } from "./AppGlobalBar";
 
 type AppHeaderProps = {
   user: AppSidebarUser;
@@ -24,10 +25,7 @@ export function AppHeader({ user, onMenuClick }: AppHeaderProps) {
       >
         <span className="material-icons-outlined text-2xl">menu</span>
       </button>
-      <Link
-        href={logoHref}
-        className="flex items-center gap-2 min-w-0"
-      >
+      <Link href={logoHref} className="flex items-center gap-2 min-w-0">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
           <span className="material-icons-outlined text-white text-lg">school</span>
         </div>
@@ -35,10 +33,8 @@ export function AppHeader({ user, onMenuClick }: AppHeaderProps) {
           Apply2Campus
         </span>
       </Link>
-      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
-        <span className="text-xs font-bold text-primary">
-          {user.name?.slice(0, 2).toUpperCase() ?? "U"}
-        </span>
+      <div className="flex items-center gap-1 -mr-1">
+        <AppGlobalBar user={user} embedded />
       </div>
     </header>
   );

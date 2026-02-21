@@ -2,7 +2,7 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { isOperationRole } from "@/lib/roles";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
 import { OperasyonMessageClient } from "./OperasyonMessageClient";
 
 export default async function OperasyonMessagePage({
@@ -37,19 +37,19 @@ export default async function OperasyonMessagePage({
   const subject = message.subject?.trim() || "(Konu yok)";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <PageHeader
-        backHref="/operasyon/inbox"
-        backLabel="Inbox'a dön"
-        title={subject}
-        className="!px-3 sm:!px-4"
-      />
+    <PanelLayout
+      backHref="/operasyon/inbox"
+      backLabel="Inbox'a dön"
+      title={subject}
+      subtitle="Mail detayı"
+      sticky
+    >
       <OperasyonMessageClient
         messageId={message.id}
         message={message}
         thread={thread}
         students={students}
       />
-    </div>
+    </PanelLayout>
   );
 }

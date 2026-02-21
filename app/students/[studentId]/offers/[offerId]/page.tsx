@@ -2,7 +2,7 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PageHeader } from "@/components/PageHeader";
+import { PanelLayout } from "@/components/PanelLayout";
 import { OfferDetailClient } from "./OfferDetailClient";
 import { prisma } from "@/lib/db";
 
@@ -45,16 +45,14 @@ export default async function OfferDetailPage({
   };
 
   return (
-    <>
-      <PageHeader
-        backHref={`/students/${studentId}`}
-        backLabel={offer.student.name}
-        title={offer.title}
-        subtitle="Teklif detayı"
-        sticky
-      />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+    <PanelLayout
+      backHref={`/students/${studentId}`}
+      backLabel="Öğrenciye dön"
+      title={offer.title}
+      subtitle="Teklif detayı"
+      sticky
+    >
+      <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
           <Link href="/students" className="hover:text-primary">Öğrenciler</Link>
           <span className="material-icons-outlined text-xs">chevron_right</span>
           <Link href={`/students/${studentId}`} className="hover:text-primary truncate">{offer.student.name}</Link>
@@ -66,7 +64,6 @@ export default async function OfferDetailPage({
           offer={offerForClient}
           isStudent={false}
         />
-      </main>
-    </>
+    </PanelLayout>
   );
 }
