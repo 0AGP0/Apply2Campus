@@ -1,11 +1,23 @@
 -- DocumentCategory ve StudentDocumentByCategory tablolarını manuel oluştur
 -- Migration kayıtlı ama tablolar eksik olduğunda kullanılır.
 
--- DocumentStatus enum (StudentDocumentByCategory için gerekli)
+-- DocumentStatus enum (StudentDocument ve StudentDocumentByCategory için gerekli)
 DO $$ BEGIN
   CREATE TYPE "DocumentStatus" AS ENUM ('UPLOADED', 'APPROVED', 'REVISION_REQUESTED');
 EXCEPTION
   WHEN duplicate_object THEN NULL;
+END $$;
+
+-- StudentDocument tablosuna version ve status sütunları (migration eksikse)
+DO $$ BEGIN
+  ALTER TABLE "StudentDocument" ADD COLUMN "status" "DocumentStatus" NOT NULL DEFAULT 'UPLOADED';
+EXCEPTION
+  WHEN duplicate_column THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE "StudentDocument" ADD COLUMN "version" INTEGER NOT NULL DEFAULT 1;
+EXCEPTION
+  WHEN duplicate_column THEN NULL;
 END $$;
 
 -- DocumentCategoryType enum (zaten varsa hata vermez)
