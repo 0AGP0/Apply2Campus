@@ -50,23 +50,24 @@ export async function POST(req: NextRequest) {
     if (!email) return NextResponse.json({ error: "Geçersiz mail referansı" }, { status: 400 });
   }
 
-  const task = await prisma.task.create({
-    data: {
-      title,
-      description,
-      assignedById: session.user.id,
-      assignedToId: assignee.id,
-      studentId,
-      relatedEmailId,
-    },
-    include: {
-      assignedBy: { select: { id: true, name: true, email: true } },
-      assignedTo: { select: { id: true, name: true, email: true } },
-      student: { select: { id: true, name: true } },
-    },
-  });
+  try {
+    const task = await prisma.task.create({
+      data: {
+        title,
+        description,
+        assignedById: session.user.id,
+        assignedToId: assignee.id,
+        studentId,
+        relatedEmailId,
+      },
+      include: {
+        assignedBy: { select: { id: true, name: true, email: true } },
+        assignedTo: { select: { id: true, name: true, email: true } },
+        student: { select: { id: true, name: true } },
+      },
+    });
 
-  return NextResponse.json({
+    return NextResponse.json({
     task: {
       id: task.id,
       title: task.title,
@@ -78,4 +79,9 @@ export async function POST(req: NextRequest) {
       student: task.student ? { id: task.student.id, name: task.student.name } : null,
     },
   });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Veritabanı hatası";
+    console.error("[api/tasks POST]", e);
+    return NextResponse.json({ error: `Görev oluşturulamadı: ${msg}` }, { status: 500 });
+  }
 }

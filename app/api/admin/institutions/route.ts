@@ -3,11 +3,12 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if ((session.user as { role?: string }).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if ((session.user as { role?: string }).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const institutions = await prisma.institution.findMany({
+    const institutions = await prisma.institution.findMany({
     orderBy: [{ type: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
     include: {
       services: {
@@ -32,27 +33,38 @@ export async function GET() {
       })),
     })),
   });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Veritabanı hatası";
+    console.error("[api/admin/institutions GET]", e);
+    return NextResponse.json({ error: msg, institutions: [] }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if ((session.user as { role?: string }).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if ((session.user as { role?: string }).role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const body = await req.json().catch(() => ({}));
-  const type = ["UNIVERSITY", "LANGUAGE_COURSE", "ACCOMMODATION", "OTHER"].includes(body.type) ? body.type : "OTHER";
-  const name = typeof body.name === "string" ? body.name.trim() : "";
-  if (!name) return NextResponse.json({ error: "Kurum adı gerekli" }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const type = ["UNIVERSITY", "LANGUAGE_COURSE", "ACCOMMODATION", "OTHER"].includes(body.type) ? body.type : "OTHER";
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    if (!name) return NextResponse.json({ error: "Kurum adı gerekli" }, { status: 400 });
 
-  const institution = await prisma.institution.create({
-    data: {
-      type,
-      name,
-      logoUrl: typeof body.logoUrl === "string" ? body.logoUrl.trim() || null : null,
-      description: typeof body.description === "string" ? body.description.trim() || null : null,
-      address: typeof body.address === "string" ? body.address.trim() || null : null,
-    },
-  });
+    const institution = await prisma.institution.create({
+      data: {
+        type,
+        name,
+        logoUrl: typeof body.logoUrl === "string" ? body.logoUrl.trim() || null : null,
+        description: typeof body.description === "string" ? body.description.trim() || null : null,
+        address: typeof body.address === "string" ? body.address.trim() || null : null,
+      },
+    });
 
-  return NextResponse.json({ institution });
+    return NextResponse.json({ institution });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Veritabanı hatası";
+    console.error("[api/admin/institutions POST]", e);
+    return NextResponse.json({ error: `Kurum eklenemedi: ${msg}` }, { status: 500 });
+  }
 }

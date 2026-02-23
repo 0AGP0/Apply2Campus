@@ -106,28 +106,34 @@ export async function POST(
   if (!startTime || !/^\d{1,2}:\d{2}$/.test(startTime)) return NextResponse.json({ error: "Geçerli başlangıç saati gerekli (HH:mm)" }, { status: 400 });
   if (!endTime || !/^\d{1,2}:\d{2}$/.test(endTime)) return NextResponse.json({ error: "Geçerli bitiş saati gerekli (HH:mm)" }, { status: 400 });
 
-  const slot = await prisma.consultantSlot.create({
-    data: {
-      consultantId,
-      slotDate: new Date(slotDate.getFullYear(), slotDate.getMonth(), slotDate.getDate()),
-      startTime,
-      endTime,
-    },
-  });
+  try {
+    const slot = await prisma.consultantSlot.create({
+      data: {
+        consultantId,
+        slotDate: new Date(slotDate.getFullYear(), slotDate.getMonth(), slotDate.getDate()),
+        startTime,
+        endTime,
+      },
+    });
 
-  const slotDateStr = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
+    const slotDateStr = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
 
-  return NextResponse.json({
-    slot: {
-      id: slot.id,
-      slotDate: slotDateStr(slot.slotDate),
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-    },
-  });
+    return NextResponse.json({
+      slot: {
+        id: slot.id,
+        slotDate: slotDateStr(slot.slotDate),
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Veritabanı hatası";
+    console.error("[api/consultants/.../slots POST]", e);
+    return NextResponse.json({ error: `Slot eklenemedi: ${msg}` }, { status: 500 });
+  }
 }
