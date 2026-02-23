@@ -31,7 +31,7 @@ Beklenen: `Database schema is up to date!` veya tüm migration’lar uygulanmı�
 npx prisma migrate deploy
 ```
 
-**Not:** "No pending migrations" ama tablo yoksa → `prisma/fix-document-categories.sql` ile manuel tablo oluşturma gerekebilir.
+**Not:** "No pending migrations" ama tablo yoksa → `docs/legacy-fixes/fix-document-categories.sql` ile manuel tablo oluşturma gerekebilir.
 
 ---
 
@@ -208,7 +208,7 @@ pm2 restart all
 
 | Belirti | Olası sebep | Çözüm |
 |---------|-------------|-------|
-| Tablo yok | Migration uygulanmamış | `prisma migrate deploy` veya `fix-document-categories.sql` |
+| Tablo yok | Migration uygulanmamış | `prisma migrate deploy` veya `docs/legacy-fixes/fix-document-categories.sql` |
 | permission denied | apply2campus yetkisi yok | GRANT komutlarını çalıştır |
 | Belge alanları tanımlı değil | CrmSection/CrmField boş | `npm run db:seed-crm` |
 | Veriler yüklenemedi | API 401/403/500 | Session/cookie kontrolü, Network sekmesi |

@@ -44,6 +44,7 @@ export function AdminDuyurularClient() {
       const res = await fetch("/api/admin/announcements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           type,
           title: title.trim(),
@@ -60,9 +61,11 @@ export function AdminDuyurularClient() {
         setEndDate("");
         load();
       } else {
-        const d = await res.json();
-        alert(d.error ?? "Eklenemedi");
+        const d = await res.json().catch(() => ({}));
+        alert(d.error ?? `Eklenemedi (${res.status})`);
       }
+    } catch (e) {
+      alert("Bağlantı hatası. Sunucuya ulaşılamıyor olabilir.");
     } finally {
       setSubmitting(false);
     }

@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { PanelLayout } from "@/components/PanelLayout";
+import { formatAgo, initials } from "@/lib/utils";
 
 const ROLE_LABELS: Record<string, string> = {
   CONSULTANT: "Danışman",
@@ -20,28 +21,6 @@ type Consultant = {
   assignedStudents?: { id: string; name: string }[];
   auditLogs?: { createdAt: string; message: string | null }[];
 };
-
-function initials(str: string | null | undefined): string {
-  if (!str?.trim()) return "—";
-  const parts = str.trim().split(/\s+/);
-  if (parts.length >= 2)
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase().slice(0, 2);
-  return str.slice(0, 2).toUpperCase();
-}
-
-function formatAgo(dateStr: string) {
-  const d = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffM = Math.floor(diffMs / 60000);
-  const diffH = Math.floor(diffM / 60);
-  const diffD = Math.floor(diffH / 24);
-  if (diffM < 1) return "az önce";
-  if (diffM < 60) return `${diffM} dk önce`;
-  if (diffH < 24) return `${diffH} sa önce`;
-  if (diffD < 7) return `${diffD} gün önce`;
-  return d.toLocaleDateString("tr-TR");
-}
 
 export function AdminConsultantsClient() {
   const [consultants, setConsultants] = useState<Consultant[]>([]);
@@ -544,8 +523,8 @@ export function AdminConsultantsClient() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="input-panel"
-                  placeholder="En az 6 karakter"
-                  minLength={6}
+                  placeholder="En az 8 karakter"
+                  minLength={8}
                   required
                 />
               </div>

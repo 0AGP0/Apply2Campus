@@ -2,6 +2,15 @@
 
 **Kural: Projeyi güncellediğinde (git pull + build + restart) sunucudaki hiçbir veri otomatik olarak değişmez veya silinmez.** Aksi açıkça belirtilmedikçe bu böyledir.
 
+## Production checklist (Duyuru, Kurum, Slot, Görev ekleme çalışmıyorsa)
+
+Sunucuda ekleme işlemleri başarısız oluyorsa şunları kontrol edin:
+
+1. **NEXTAUTH_URL** – Production ortamında tam URL olmalı: `https://your-domain.com` (http değil, sonunda `/` yok)
+2. **NEXTAUTH_SECRET** – Sunucuda tanımlı ve en az 32 karakter
+3. **HTTPS** – Session cookie `Secure` ile set edilir; yalnızca HTTPS üzerinden gönderilir. Proxy arkasındaysanız X-Forwarded-Proto: https olmalı
+4. **Cookie domain** – NEXTAUTH_URL ile aynı domain kullanılmalı
+
 ## Standart güncelleme (veriye dokunulmaz)
 
 ```bash

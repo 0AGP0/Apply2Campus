@@ -85,16 +85,17 @@ export function SlotManagementClient({ consultantId }: { consultantId: string })
       const res = await fetch(`/api/consultants/${consultantId}/slots`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ slotDate, startTime, endTime }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Slot eklenemedi");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? `Slot eklenemedi (${res.status})`);
       await load();
       setSlotDate(new Date().toISOString().slice(0, 10));
       setStartTime("09:00");
       setEndTime("09:30");
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : "Slot eklenemedi");
+      setSubmitError(e instanceof Error ? e.message : "Bağlantı hatası veya slot eklenemedi.");
     } finally {
       setAdding(false);
     }

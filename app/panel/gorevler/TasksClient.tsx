@@ -81,6 +81,7 @@ export function TasksClient() {
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           title: formTitle.trim(),
           description: formDescription.trim() || undefined,
@@ -88,8 +89,8 @@ export function TasksClient() {
           studentId: formStudentId || undefined,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Görev oluşturulamadı");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? `Görev oluşturulamadı (${res.status})`);
       setShowForm(false);
       setFormTitle("");
       setFormDescription("");
@@ -97,7 +98,7 @@ export function TasksClient() {
       setFormStudentId("");
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Görev oluşturulamadı");
+      setError(e instanceof Error ? e.message : "Bağlantı hatası veya görev oluşturulamadı.");
     } finally {
       setSubmitting(false);
     }

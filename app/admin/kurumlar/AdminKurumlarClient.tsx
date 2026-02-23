@@ -60,6 +60,7 @@ export function AdminKurumlarClient() {
       const res = await fetch("/api/admin/institutions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name: newName.trim(), type: newType }),
       });
       if (res.ok) {
@@ -67,9 +68,11 @@ export function AdminKurumlarClient() {
         setNewName("");
         await load();
       } else {
-        const d = await res.json();
-        alert(d.error ?? "Eklenemedi");
+        const d = await res.json().catch(() => ({}));
+        alert(d.error ?? `Eklenemedi (${res.status})`);
       }
+    } catch (e) {
+      alert("Bağlantı hatası. Sunucuya ulaşılamıyor olabilir.");
     } finally {
       setSubmitting(false);
     }
@@ -82,6 +85,7 @@ export function AdminKurumlarClient() {
       const res = await fetch(`/api/admin/institutions/${addServiceModal.institutionId}/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name: newServiceName.trim(), group: newServiceGroup }),
       });
       if (res.ok) {
@@ -89,9 +93,11 @@ export function AdminKurumlarClient() {
         setNewServiceName("");
         await load();
       } else {
-        const d = await res.json();
-        alert(d.error ?? "Eklenemedi");
+        const d = await res.json().catch(() => ({}));
+        alert(d.error ?? `Eklenemedi (${res.status})`);
       }
+    } catch (e) {
+      alert("Bağlantı hatası.");
     } finally {
       setSubmitting(false);
     }
@@ -106,6 +112,7 @@ export function AdminKurumlarClient() {
       const res = await fetch(`/api/admin/institutions/services/${addPriceModal.serviceId}/prices`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           startDate: newPriceStart,
           endDate: newPriceEnd,
@@ -120,9 +127,11 @@ export function AdminKurumlarClient() {
         setNewPriceAmount("");
         await load();
       } else {
-        const d = await res.json();
-        alert(d.error ?? "Eklenemedi");
+        const d = await res.json().catch(() => ({}));
+        alert(d.error ?? `Eklenemedi (${res.status})`);
       }
+    } catch (e) {
+      alert("Bağlantı hatası.");
     } finally {
       setSubmitting(false);
     }

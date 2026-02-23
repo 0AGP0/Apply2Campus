@@ -12,6 +12,7 @@ import bcrypt from "bcryptjs";
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
+  trustHost: true, // Proxy/reverse proxy arkasında session için gerekli
   cookies: {
     sessionToken: {
       name: process.env.NODE_ENV === "production"

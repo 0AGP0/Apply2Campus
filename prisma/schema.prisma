@@ -1,4 +1,4 @@
-// EduConsult CRM - Prisma Schema
+// Apply2Campus - Prisma Schema
 generator client {
   provider = "prisma-client-js"
 }

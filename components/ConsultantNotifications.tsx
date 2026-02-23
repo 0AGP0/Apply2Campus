@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { formatAgo } from "@/lib/utils";
 
 type Notification = {
   id: string;
@@ -59,20 +60,6 @@ export function ConsultantNotifications({ compact = false }: ConsultantNotificat
     setList((prev) =>
       prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() }))
     );
-  }
-
-  function formatAgo(dateStr: string) {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffM = Math.floor(diffMs / 60000);
-    const diffH = Math.floor(diffM / 60);
-    const diffD = Math.floor(diffH / 24);
-    if (diffM < 1) return "az önce";
-    if (diffM < 60) return `${diffM} dk önce`;
-    if (diffH < 24) return `${diffH} sa önce`;
-    if (diffD < 7) return `${diffD} gün önce`;
-    return d.toLocaleDateString("tr-TR");
   }
 
   if (loading && list.length === 0 && !compact) return null;

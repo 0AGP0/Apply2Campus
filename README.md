@@ -1,4 +1,4 @@
-# EduConsult CRM – Consultant Portal MVP
+# Apply2Campus – Consultant Portal MVP
 
 A consultant portal where consultants manage 600+ students. Each student connects their Gmail via Google OAuth. Consultants can view their assigned students, open a student profile, view that student's Gmail inbox (synced via Gmail API), read email threads, and reply/send emails **from the student's Gmail account** (via Gmail API with OAuth). Admins can see all students and system health/audit logs.
 
@@ -28,7 +28,7 @@ npm install
 
 Copy `.env.example` to `.env` and fill in:
 
-- **DATABASE_URL** – PostgreSQL connection string (e.g. `postgresql://user:password@localhost:5432/educonsult`)
+- **DATABASE_URL** – PostgreSQL connection string (e.g. `postgresql://user:password@localhost:5432/apply2campus`)
 - **NEXTAUTH_URL** – App URL (e.g. `http://localhost:3000`)
 - **NEXTAUTH_SECRET** – Long random string for JWT/session signing
 - **TOKEN_ENCRYPTION_SECRET** – At least 32 characters; used to encrypt Gmail tokens at rest (AES-256-GCM)
