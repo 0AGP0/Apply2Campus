@@ -1,22 +1,34 @@
-# Legacy Fix SQL Scriptleri
+# Sunucuda Çalıştırılacak SQL Düzeltmeleri
 
-Bu klasördeki SQL dosyaları, migration geçmişi eksik veya bozulmuş sunucularda manuel düzeltme için tutulmuştur.
+`npx prisma migrate dev` shadow database izni gerektirdiği için sunucuda çalıştırılamıyor. Aşağıdaki SQL dosyası ile tüm eksik tablolar ve güncellemeler tek seferde uygulanır.
 
-**Yeni kurulumda bu dosyalara gerek yoktur.** Normal akış:
+## Tek Komutla Çalıştırma
+
+Proje kök dizininde:
 
 ```bash
-npx prisma migrate deploy
-npm run db:seed
+source .env && psql "${DATABASE_URL%%\?*}" -f docs/legacy-fixes/run-all-legacy-fixes.sql
 ```
 
-## Ne Zaman Kullanılır?
+veya shell script ile:
 
-Sadece aşağıdaki durumlarda, veritabanına manuel bağlanıp ilgili dosyayı çalıştırın:
+```bash
+chmod +x docs/legacy-fixes/run-legacy-fixes.sh
+./docs/legacy-fixes/run-legacy-fixes.sh
+```
 
-| Dosya | Durum |
-|-------|--------|
-| `fix-student-document-columns.sql` | `StudentDocument.version` veya `status` sütunu yok hatası alıyorsanız |
-| `fix-document-categories.sql` | `DocumentCategory` veya `StudentDocumentByCategory` tabloları eksikse |
-| `fix-missing-migrations.sql` | Student tablosunda `visaCity`, `visaInstitution`, `visaNotes`, `visaProgramStartDate` sütunları yoksa |
+## Doğrudan psql ile
 
-**Not:** Scriptler idempotent tasarlanmıştır; zaten varsa hata vermez.
+```bash
+psql "postgresql://USER:PASS@HOST:5432/DBNAME" -f docs/legacy-fixes/run-all-legacy-fixes.sql
+```
+
+`.env` içindeki `DATABASE_URL`'deki `?schema=public` gibi parametreleri kaldırın (psql desteklemez).
+
+## Ne Yapıyor?
+
+1. **Eksik tablolar:** Announcement, Institution, InstitutionImage, InstitutionService, InstitutionPrice, ConsultantSlot, AppointmentRequest, Task
+2. **OfferItem güncellemesi:** `durationWeeks` nullable, `institutionId`, `startDate`, `endDate` kolonları
+3. **UserNotification tablosu:** Duyuru ve teklif bildirimleri
+
+İdempotent: Aynı script birden fazla kez çalıştırılabilir, mevcut nesneler atlanır.
