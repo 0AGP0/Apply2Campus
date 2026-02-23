@@ -505,15 +505,16 @@ model ConsultantNotification {
 
 // Etkinlikler – Duyurular (öğrenci genel bakış)
 model Announcement {
-  id        String    @id @default(cuid())
-  type      String    // DUYURU | ETKINLIK
-  title     String
-  body      String?   @db.Text
-  startDate DateTime? @db.Date
-  endDate   DateTime? @db.Date
-  sortOrder Int       @default(0)
-  active    Boolean   @default(true)
-  createdAt DateTime  @default(now())
+  id             String    @id @default(cuid())
+  type           String    // DUYURU | ETKINLIK
+  title          String
+  body           String?   @db.Text
+  startDate      DateTime? @db.Date
+  endDate        DateTime? @db.Date
+  sortOrder      Int       @default(0)
+  active         Boolean   @default(true)
+  targetAudience String    @default("ALL") // STUDENTS | CONSULTANTS | ALL
+  createdAt      DateTime  @default(now())
 
   @@index([active])
   @@index([sortOrder])

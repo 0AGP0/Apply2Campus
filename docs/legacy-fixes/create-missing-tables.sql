@@ -14,9 +14,15 @@ CREATE TABLE IF NOT EXISTS "Announcement" (
   "endDate" DATE,
   "sortOrder" INTEGER NOT NULL DEFAULT 0,
   "active" BOOLEAN NOT NULL DEFAULT true,
+  "targetAudience" TEXT NOT NULL DEFAULT 'ALL',
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "Announcement_pkey" PRIMARY KEY ("id")
 );
+-- Mevcut tabloya targetAudience ekle (zaten varsa hata vermez)
+DO $$ BEGIN
+  ALTER TABLE "Announcement" ADD COLUMN "targetAudience" TEXT NOT NULL DEFAULT 'ALL';
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
 CREATE INDEX IF NOT EXISTS "Announcement_active_idx" ON "Announcement"("active");
 CREATE INDEX IF NOT EXISTS "Announcement_sortOrder_idx" ON "Announcement"("sortOrder");
 

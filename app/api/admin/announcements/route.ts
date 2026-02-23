@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
     const bodyText = typeof body.body === "string" ? body.body.trim() || null : null;
     const startDate = body.startDate ? new Date(body.startDate) : null;
     const endDate = body.endDate ? new Date(body.endDate) : null;
+    const targetAudience = ["STUDENTS", "CONSULTANTS", "ALL"].includes(body.targetAudience)
+      ? body.targetAudience
+      : "ALL";
 
     const a = await prisma.announcement.create({
       data: {
@@ -44,10 +47,11 @@ export async function POST(req: NextRequest) {
         body: bodyText,
         startDate: startDate && !isNaN(startDate.getTime()) ? startDate : null,
         endDate: endDate && !isNaN(endDate.getTime()) ? endDate : null,
+        targetAudience,
       },
     });
 
-    notifyAnnouncementToAll(a.id, title, type).catch((err) =>
+    notifyAnnouncementToAll(a.id, title, type, targetAudience).catch((err) =>
       console.error("[api/admin/announcements] notifyAnnouncementToAll", err)
     );
 

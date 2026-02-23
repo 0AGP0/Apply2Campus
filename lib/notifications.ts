@@ -44,31 +44,40 @@ export async function createUserNotification(
 }
 
 /**
- * Duyuru eklendiğinde tüm öğrenci ve danışman/operasyon kullanıcılarına bildirim gönderir.
+ * Duyuru eklendiğinde hedef kitleye bildirim gönderir.
+ * @param targetAudience STUDENTS | CONSULTANTS | ALL
  */
-export async function notifyAnnouncementToAll(announcementId: string, title: string, type: string): Promise<void> {
-  const students = await prisma.user.findMany({ where: { studentId: { not: null } }, select: { id: true, role: true } });
-  const staff = await prisma.user.findMany({
-    where: { role: { in: ["CONSULTANT", "OPERATION_UNIVERSITY", "OPERATION_ACCOMMODATION", "OPERATION_VISA", "ADMIN"] } },
-    select: { id: true },
-  });
-  const linkForStudent = "/dashboard/duyurular";
-  const linkForStaff = "/panel/duyurular";
+export async function notifyAnnouncementToAll(
+  announcementId: string,
+  title: string,
+  type: string,
+  targetAudience: string = "ALL"
+): Promise<void> {
   const label = type === "ETKINLIK" ? "Yeni etkinlik" : "Yeni duyuru";
 
-  for (const u of students) {
-    await createUserNotification(u.id, "ANNOUNCEMENT", label, {
-      message: title,
-      linkHref: linkForStudent,
-      relatedId: announcementId,
-    }).catch(() => {});
+  if (targetAudience === "STUDENTS" || targetAudience === "ALL") {
+    const students = await prisma.user.findMany({ where: { studentId: { not: null } }, select: { id: true } });
+    for (const u of students) {
+      await createUserNotification(u.id, "ANNOUNCEMENT", label, {
+        message: title,
+        linkHref: "/dashboard/duyurular",
+        relatedId: announcementId,
+      }).catch(() => {});
+    }
   }
-  for (const u of staff) {
-    await createUserNotification(u.id, "ANNOUNCEMENT", label, {
-      message: title,
-      linkHref: linkForStaff,
-      relatedId: announcementId,
-    }).catch(() => {});
+
+  if (targetAudience === "CONSULTANTS" || targetAudience === "ALL") {
+    const staff = await prisma.user.findMany({
+      where: { role: { in: ["CONSULTANT", "OPERATION_UNIVERSITY", "OPERATION_ACCOMMODATION", "OPERATION_VISA", "ADMIN"] } },
+      select: { id: true },
+    });
+    for (const u of staff) {
+      await createUserNotification(u.id, "ANNOUNCEMENT", label, {
+        message: title,
+        linkHref: "/panel/duyurular",
+        relatedId: announcementId,
+      }).catch(() => {});
+    }
   }
 }
 

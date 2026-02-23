@@ -10,19 +10,21 @@ export async function GET() {
   const allowed = role === "STUDENT" || role === "CONSULTANT" || role === "ADMIN" || ["OPERATION_UNIVERSITY", "OPERATION_ACCOMMODATION", "OPERATION_VISA"].includes(role);
   if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  let items: { id: string; type: string; title: string; body: string | null; startDate: Date | null; endDate: Date | null; sortOrder: number; createdAt: Date }[] = [];
+  let items: { id: string; type: string; title: string; body: string | null; startDate: Date | null; endDate: Date | null; sortOrder: number; targetAudience: string; createdAt: Date }[] = [];
   try {
+    const isStudent = role === "STUDENT";
+    const audienceFilter = isStudent
+      ? { OR: [{ targetAudience: "ALL" }, { targetAudience: "STUDENTS" }] }
+      : { OR: [{ targetAudience: "ALL" }, { targetAudience: "CONSULTANTS" }] };
+
     items = await prisma.announcement.findMany({
-    where: {
-      active: true,
-      OR: [{ endDate: null }, { endDate: { gte: today } }],
-    },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-    take: 20,
-  });
+      where: {
+        active: true,
+        ...audienceFilter,
+      },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+      take: 50,
+    });
   } catch (e) {
     console.error("[api/announcements GET]", e);
   }
