@@ -59,7 +59,7 @@ export function StudentOffersSection({ studentId }: { studentId: string }) {
   }>({ countries: [], byCountry: {} });
 
   const fetchOffers = () => {
-    fetch(`/api/students/${studentId}/offers`)
+    fetch(`/api/students/${studentId}/offers`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => setOffers(d.offers ?? []))
       .catch(() => setOffers([]))
@@ -300,6 +300,7 @@ function OfferFormModal({
     setSaving(true);
     const res = await fetch(`/api/students/${studentId}/offers`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         title: title.trim(),

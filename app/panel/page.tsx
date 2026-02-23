@@ -2,6 +2,7 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { getStudentsForUser } from "@/lib/rbac";
 import { PanelLayout } from "@/components/PanelLayout";
 import { InfoCard } from "@/components/InfoCard";
+import { AnnouncementsCard } from "@/components/AnnouncementsCard";
 import { isOperationRole } from "@/lib/roles";
 import Link from "next/link";
 
@@ -81,6 +82,12 @@ export default async function PanelPage() {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mt-4 mb-6">
+        <div className="md:col-span-2">
+          <AnnouncementsCard />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mt-4 mb-6">

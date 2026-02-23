@@ -93,6 +93,7 @@ export async function POST(
   const student = await prisma.student.findUnique({ where: { id: studentId } });
   if (!student) return NextResponse.json({ error: "Öğrenci bulunamadı" }, { status: 404 });
 
+  try {
   const offerStatus = status === "SENT" ? "SENT" : "DRAFT";
   const offer = await prisma.offer.create({
     data: {
@@ -134,4 +135,9 @@ export async function POST(
   });
 
   return NextResponse.json(offer);
+  } catch (e) {
+    console.error("[api/students/[studentId]/offers POST]", e);
+    const msg = e instanceof Error ? e.message : "Teklif eklenemedi.";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }

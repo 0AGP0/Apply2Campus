@@ -1,5 +1,8 @@
 -- Eksik tabloları oluştur (veri silmeden). Sunucuda bir kez çalıştır.
--- Kullanım: psql "postgresql://USER:PASS@HOST:5432/apply2campus" -f docs/legacy-fixes/create-missing-tables.sql
+-- Kullanım (schema parametresi psql tarafından desteklenmediği için kaldırılır):
+--   source .env && psql "${DATABASE_URL%%\?*}" -f docs/legacy-fixes/create-missing-tables.sql
+-- veya:
+--   psql "postgresql://postgres:postgre@localhost:5432/apply2campus" -f docs/legacy-fixes/create-missing-tables.sql
 
 -- Announcement
 CREATE TABLE IF NOT EXISTS "Announcement" (
