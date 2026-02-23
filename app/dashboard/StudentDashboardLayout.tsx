@@ -49,6 +49,10 @@ export function StudentDashboardLayout({
           <span className="material-icons-outlined text-xl">home</span>
           <span className="font-medium text-sm">Ana Sayfa</span>
         </Link>
+        <Link href="/dashboard/duyurular" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname === "/dashboard/duyurular" ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+          <span className="material-icons-outlined text-xl">campaign</span>
+          <span className="font-medium text-sm">Duyurular</span>
+        </Link>
         <Link href="/dashboard/profilim" onClick={() => setMobileMenuOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${pathname?.startsWith("/dashboard/profilim") ? "bg-primary/10 text-primary" : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
           <span className="material-icons-outlined text-xl">person</span>
           <span className="font-medium text-sm">Profilim</span>

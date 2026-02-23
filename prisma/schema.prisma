@@ -39,6 +39,7 @@ model User {
   assignedStudents      Student[]               @relation("AssignedConsultant")
   auditLogs             AuditLog[]              @relation("ActorUser")
   consultantNotifications ConsultantNotification[]
+  userNotifications      UserNotification[]
   createdOffers          Offer[]
   accounts              Account[]
   sessions              Session[]
@@ -465,6 +466,24 @@ model AuditLog {
   @@index([actorUserId])
   @@index([studentId])
   @@index([createdAt])
+}
+
+// Genel bildirimler: duyuru, teklif gönderildi vb. (öğrenci + danışman)
+model UserNotification {
+  id         String    @id @default(cuid())
+  userId     String
+  type       String    // ANNOUNCEMENT | OFFER_SENT
+  title      String
+  message    String?   @db.Text
+  linkHref   String?
+  relatedId  String?   // announcementId veya offerId
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, readAt])
 }
 
 // Danışmana giden bildirimler: yeni öğrenci atandı / öğrenci bilgisi güncellendi

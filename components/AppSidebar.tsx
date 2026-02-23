@@ -170,6 +170,13 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
               onNavigate={onNavigate}
             />
             <NavLink
+              href="/panel/duyurular"
+              label="Duyurular"
+              icon="campaign"
+              active={pathname === "/panel/duyurular"}
+              onNavigate={onNavigate}
+            />
+            <NavLink
               href="/panel/gorevler"
               label="Görevler"
               icon="assignment"
@@ -198,6 +205,13 @@ export function AppSidebar({ user, pathname, onNavigate, variant = "desktop" }: 
               label="Müsait saatler"
               icon="event"
               active={pathname === "/panel/musait-saatler"}
+              onNavigate={onNavigate}
+            />
+            <NavLink
+              href="/panel/duyurular"
+              label="Duyurular"
+              icon="campaign"
+              active={pathname === "/panel/duyurular"}
               onNavigate={onNavigate}
             />
             <NavLink

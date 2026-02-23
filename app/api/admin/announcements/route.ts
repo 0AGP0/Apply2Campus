@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { notifyAnnouncementToAll } from "@/lib/notifications";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -45,6 +46,10 @@ export async function POST(req: NextRequest) {
         endDate: endDate && !isNaN(endDate.getTime()) ? endDate : null,
       },
     });
+
+    notifyAnnouncementToAll(a.id, title, type).catch((err) =>
+      console.error("[api/admin/announcements] notifyAnnouncementToAll", err)
+    );
 
     return NextResponse.json({
       announcement: {

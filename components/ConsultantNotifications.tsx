@@ -6,10 +6,13 @@ import { formatAgo } from "@/lib/utils";
 
 type Notification = {
   id: string;
+  kind: "consultant" | "user";
   type: string;
-  studentId: string;
-  studentName: string;
+  studentId: string | null;
+  studentName: string | null;
+  title?: string;
   message: string | null;
+  linkHref?: string | null;
   readAt: string | null;
   createdAt: string;
 };
@@ -35,7 +38,7 @@ export function ConsultantNotifications({ compact = false }: ConsultantNotificat
   }, [compact]);
 
   const fetchList = () => {
-    fetch("/api/notifications")
+    fetch("/api/notifications", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => setList(data.notifications ?? []))
       .catch(() => setList([]))
@@ -48,18 +51,20 @@ export function ConsultantNotifications({ compact = false }: ConsultantNotificat
 
   const unreadCount = list.filter((n) => !n.readAt).length;
 
-  async function markRead(id: string) {
-    await fetch(`/api/notifications/${id}`, { method: "PATCH" });
+  async function markRead(n: Notification) {
+    const url = n.kind === "user" ? `/api/me/notifications/${n.id}` : `/api/notifications/${n.id}`;
+    await fetch(url, { method: "PATCH", credentials: "include" });
     setList((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, readAt: n.readAt ?? new Date().toISOString() } : n))
+      prev.map((item) => (item.id === n.id ? { ...item, readAt: item.readAt ?? new Date().toISOString() } : item))
     );
   }
 
   async function markAllRead() {
-    await fetch("/api/notifications/read-all", { method: "POST" });
-    setList((prev) =>
-      prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() }))
-    );
+    await Promise.all([
+      fetch("/api/notifications/read-all", { method: "POST", credentials: "include" }),
+      fetch("/api/me/notifications/read-all", { method: "POST", credentials: "include" }),
+    ]);
+    setList((prev) => prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })));
   }
 
   if (loading && list.length === 0 && !compact) return null;
@@ -114,31 +119,36 @@ export function ConsultantNotifications({ compact = false }: ConsultantNotificat
                   Bildirim yok
                 </li>
               ) : (
-                list.map((n) => (
-                  <li
-                    key={n.id}
-                    className={`px-4 py-3 transition-colors ${!n.readAt ? "bg-primary/5 dark:bg-primary/10" : ""}`}
-                  >
-                    <Link
-                      href={`/students/${n.studentId}`}
-                      onClick={() => {
-                        if (!n.readAt) markRead(n.id);
-                        setOpen(false);
-                      }}
-                      className="block"
+                list.map((n) => {
+                  const href = n.kind === "user" && n.linkHref ? n.linkHref : n.studentId ? `/students/${n.studentId}` : "#";
+                  const title = n.kind === "user" ? (n.title ?? n.message ?? "Bildirim") : (n.message ?? (n.type === "STUDENT_ASSIGNED" ? "Yeni öğrenci atandı" : "Öğrenci güncellendi"));
+                  return (
+                    <li
+                      key={`${n.kind}-${n.id}`}
+                      className={`px-4 py-3 transition-colors ${!n.readAt ? "bg-primary/5 dark:bg-primary/10" : ""}`}
                     >
-                      <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
-                        {n.message ?? (n.type === "STUDENT_ASSIGNED" ? "Yeni öğrenci atandı" : "Öğrenci güncellendi")}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {formatAgo(n.createdAt)}
-                        {!n.readAt && (
-                          <span className="ml-2 inline-block w-2 h-2 rounded-full bg-primary" aria-hidden />
+                      <Link
+                        href={href}
+                        onClick={() => {
+                          if (!n.readAt) markRead(n);
+                          setOpen(false);
+                        }}
+                        className="block"
+                      >
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{title}</p>
+                        {n.kind === "user" && n.message && n.message !== title && (
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-1">{n.message}</p>
                         )}
-                      </p>
-                    </Link>
-                  </li>
-                ))
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          {formatAgo(n.createdAt)}
+                          {!n.readAt && (
+                            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-primary" aria-hidden />
+                          )}
+                        </p>
+                      </Link>
+                    </li>
+                  );
+                })
               )}
             </ul>
           </div>

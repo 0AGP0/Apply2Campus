@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { prisma } from "@/lib/db";
+import { notifyOfferSentToStudent } from "@/lib/notifications";
 
 export async function GET(
   _req: NextRequest,
@@ -101,6 +102,12 @@ export async function PATCH(
     data,
     include: { items: true },
   });
+
+  if (data.status === "SENT") {
+    notifyOfferSentToStudent(studentId, updated.id, updated.title).catch((err) =>
+      console.error("[api/students/[studentId]/offers/[offerId] notifyOfferSentToStudent", err)
+    );
+  }
 
   return NextResponse.json(updated);
 }
