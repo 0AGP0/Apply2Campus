@@ -23,8 +23,6 @@ export function AnnouncementsCard() {
       .catch(() => setAnnouncements([]));
   }, []);
 
-  if (announcements.length === 0) return null;
-
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
       <div className="px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
@@ -33,6 +31,11 @@ export function AnnouncementsCard() {
           Etkinlikler & Duyurular
         </h2>
       </div>
+      {announcements.length === 0 ? (
+        <p className="px-4 sm:px-5 py-6 text-sm text-slate-500 dark:text-slate-400 text-center">
+          Henüz duyuru yok.
+        </p>
+      ) : (
       <ul className="divide-y divide-slate-100 dark:divide-slate-800">
         {announcements.map((a) => (
           <li key={a.id} className="px-4 sm:px-5 py-4">
@@ -61,6 +64,7 @@ export function AnnouncementsCard() {
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }

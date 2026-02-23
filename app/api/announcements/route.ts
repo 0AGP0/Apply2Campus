@@ -13,7 +13,9 @@ export async function GET() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const items = await prisma.announcement.findMany({
+  let items: { id: string; type: string; title: string; body: string | null; startDate: Date | null; endDate: Date | null; sortOrder: number; createdAt: Date }[] = [];
+  try {
+    items = await prisma.announcement.findMany({
     where: {
       active: true,
       OR: [{ endDate: null }, { endDate: { gte: today } }],
@@ -21,6 +23,9 @@ export async function GET() {
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     take: 20,
   });
+  } catch (e) {
+    console.error("[api/announcements GET]", e);
+  }
 
   return NextResponse.json({
     announcements: items.map((a) => ({
