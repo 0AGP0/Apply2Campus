@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "dev:fresh": "node scripts/kill-port-3000.js && next dev -p 3000",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
