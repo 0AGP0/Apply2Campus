@@ -134,6 +134,9 @@ function LoginForm() {
               Kayıt ol
             </Link>
           </p>
+          <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">
+            <Link href="/gizlilik" className="hover:text-primary hover:underline">Gizlilik Politikası</Link>
+          </p>
         </div>
       </div>
     </div>
