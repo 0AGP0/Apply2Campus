@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 // Google OAuth Privacy Policy için: Gerçek destek e-postanızla değiştirin.
-const PRIVACY_EMAIL = "privacy@apply2campus.com";
+const PRIVACY_EMAIL = "akifgiraypusat@gmail.com";
 
 export const metadata = {
   title: "Gizlilik Politikası | Apply2Campus",
