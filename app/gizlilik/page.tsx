@@ -60,26 +60,28 @@ export default function GizlilikPage() {
         <p className="font-medium mt-6">Google kullanıcı verilerinin paylaşımı ve açıklanması</p>
         <p>
           Google kullanıcı verilerini üçüncü taraflara satmıyor, kiraya vermiyor veya takas etmiyoruz.
-          Google kullanıcı verileri yalnızca aşağıdaki sınırlı durumlarda paylaşılabilir:
+          <strong> Google kullanıcı verilerini kimlerle paylaşıyoruz?</strong> Bu verileri yalnızca aşağıdaki taraflarla paylaşır, devreder veya açıklarız:
         </p>
         <ul className="list-disc pl-6 space-y-1">
-          <li>Uygulamanın işletilmesi ve bakımı amacıyla güvenilir hizmet sağlayıcılarıyla (bulut barındırma veya otomasyon platformları gibi).</li>
-          <li>Yasa, düzenleme veya hukuki süreç gerektirdiğinde.</li>
-          <li>Kullanıcılarımızın veya kamuoyunun haklarını, güvenliğini veya güvenliğini korumak için.</li>
+          <li><strong>Barındırma ve altyapı hizmet sağlayıcılarımız:</strong> Uygulamanın sunulduğu sunucuları işleten, verileri yalnızca barındırma amacıyla işleyen güvenilir bulut/sunucu sağlayıcıları (ör. VPS veya bulut barındırma firmaları). Bu taraflar veriyi yalnızca hizmet sunumu için kullanır, reklam veya kendi amaçları için kullanmaz.</li>
+          <li><strong>Yasal zorunluluk:</strong> Yasa, düzenleme veya mahkeme/ yetkili makam kararı gerektirdiğinde, yalnızca yetkili kamu kurumları veya kolluk kuvvetleri ile.</li>
+          <li><strong>Güvenlik ve hakların korunması:</strong> Kullanıcılarımızın veya kamuoyunun güvenliğini, güvenliğini veya haklarını korumak için zorunlu olduğu durumlarda, yalnızca bu amaca yönelik olarak.</li>
         </ul>
-        <p>Tüm üçüncü taraf hizmet sağlayıcıları, kullanıcı verilerini korumak ve yalnızca uygulamamıza hizmet sunmak için kullanmakla sözleşmeyle yükümlüdür.</p>
-        <p className="font-medium mt-6">Veri saklama politikası</p>
         <p>
-          Google kullanıcı verilerini yalnızca uygulamanın işlevselliğini sunmak için gerekli olduğu sürece saklarız.
-          Saklamaya devam gerekmiyorsa, Google kullanıcı verileri sistemlerimizden güvenli bir şekilde silinir.
-          Google kullanıcı verilerini meşru operasyonel amaçlar için gerekenden daha uzun süre saklamıyoruz.
+          <strong>Google kullanıcı verilerini aşağıdaki taraflarla paylaşmıyoruz:</strong> reklam şirketleri, veri aracıları, pazarlama firmaları veya uygulama işlevselliği dışında herhangi bir üçüncü taraf. Tüm hizmet sağlayıcıları sözleşmeyle kullanıcı verisini korumak ve yalnızca bize hizmet sunmak için kullanmakla yükümlüdür.
         </p>
-        <p className="font-medium mt-6">Veri silme politikası</p>
+        <p className="font-medium mt-6">Google kullanıcı verilerinin saklanması (retention)</p>
         <p>
-          Kullanıcılar, Google kullanıcı verilerinin silinmesini istedikleri zaman bize şu adresten ulaşabilir:{" "}
+          Google kullanıcı verilerini <strong>yalnızca uygulamanın işlevselliğini sunmak için gerekli olduğu sürece</strong> saklarız. Bu süre, hesabınızın aktif olması ve Gmail bağlantısının açık kalmasıyla sınırlıdır. Saklamaya devam etmek gerekli olmadığında (örneğin hesap bağlantısı kaldırıldığında veya silme talebi yapıldığında), Google kullanıcı verileri sistemlerimizden güvenli şekilde silinir. Meşru operasyonel amaçlar için gerekenden daha uzun süre saklamıyoruz.
+        </p>
+        <p className="font-medium mt-6">Google kullanıcı verilerinin silinmesi (deletion)</p>
+        <p>
+          <strong>Silme talebi:</strong> Google kullanıcı verilerinizin tamamının silinmesini istediğinizde bize şu e-posta adresinden yazabilirsiniz:{" "}
           <a href={`mailto:${PRIVACY_EMAIL}`} className="text-indigo-600 dark:text-indigo-400 hover:underline">{PRIVACY_EMAIL}</a>.
-          Silme talebi aldığımızda, ilgili tüm Google kullanıcı verilerini 30 gün içinde kalıcı olarak sileriz.
-          Kullanıcı Google hesabını uygulamamızdan ayırırsa, saklanan tüm Google kullanıcı verileri makul bir süre içinde otomatik olarak silinir.
+          Talebinizi aldıktan sonra <strong>30 gün içinde</strong> ilgili tüm Google kullanıcı verilerini kalıcı olarak sileriz.
+        </p>
+        <p>
+          <strong>Hesap bağlantısını kaldırma:</strong> Uygulama içinden Google hesabınızın bağlantısını kaldırırsanız, bu hesaba ait saklanan Google kullanıcı verileri makul bir süre içinde (genellikle 30 gün içinde) otomatik olarak silinir.
         </p>
         <p className="font-medium mt-6">Sınırlı kullanım uyumluluğu</p>
         <p>
