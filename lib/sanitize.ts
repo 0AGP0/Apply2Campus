@@ -29,10 +29,15 @@ const EMAIL_WHITELIST: Record<string, string[]> = {
 
 /**
  * E-posta HTML içeriğini XSS'e karşı güvenli hale getirir.
+ * Gmail gibi tam sayfa HTML (<!DOCTYPE><html><body>...) gelirse sadece body içeriği alınır, böylece render edilebilir.
  */
 export function sanitizeEmailHtml(html: string | null | undefined): string {
   if (html == null || html === "") return "";
-  return filterXSS(html, { whiteList: EMAIL_WHITELIST });
+  let content = html.trim();
+  // Tam sayfa HTML ise sadece <body> içeriğini al (aksi halde xss whitelist dışı tag'ler yüzünden tümü escape edilip metin gibi görünür)
+  const bodyMatch = content.match(/<body[^>]*>([\s\S]*)<\/body\s*>/i);
+  if (bodyMatch) content = bodyMatch[1];
+  return filterXSS(content, { whiteList: EMAIL_WHITELIST });
 }
 
 /**
