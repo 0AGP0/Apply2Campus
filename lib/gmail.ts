@@ -2,7 +2,6 @@ import { google } from "googleapis";
 import { decrypt, encrypt } from "./encryption";
 import { safeEmailHeaderValue } from "./sanitize";
 import { prisma } from "./db";
-import type { GmailConnection } from "@prisma/client";
 
 const SCOPES = [
   "https://www.googleapis.com/auth/gmail.readonly",
@@ -112,7 +111,7 @@ export async function syncStudentInbox(studentId: string, maxResults = 50) {
     const to = getHeader("To");
     const cc = getHeader("Cc");
     const subject = getHeader("Subject");
-    const dateStr = getHeader("Date");
+    const internalDate = msg.internalDate ? new Date(Number(msg.internalDate)) : new Date();
     let bodyHtml: string | null = null;
     if (payload?.body?.data) {
       bodyHtml = Buffer.from(payload.body.data, "base64").toString("utf-8");
@@ -124,7 +123,6 @@ export async function syncStudentInbox(studentId: string, maxResults = 50) {
         }
       }
     }
-    const internalDate = msg.internalDate ? new Date(Number(msg.internalDate)) : new Date();
 
     await prisma.emailMessage.upsert({
       where: {
@@ -189,7 +187,6 @@ export async function sendEmailAsStudent(
   let raw: string;
 
   if (attachments.length === 0) {
-    // Tek parça: sadece HTML gövde
     const bodyBase64 = Buffer.from(bodyContent, "utf-8").toString("base64");
     const bodyBase64Lines = bodyBase64.match(/.{1,76}/g) ?? [];
     const headerLines = [
@@ -203,7 +200,6 @@ export async function sendEmailAsStudent(
     ].filter(Boolean);
     raw = headerLines.join("\r\n") + "\r\n\r\n" + bodyBase64Lines.join("\r\n") + "\r\n";
   } else {
-    // Multipart: gövde + ekler
     const boundary = "----=_Part_" + Date.now() + "_" + Math.random().toString(36).slice(2);
     const headerLines = [
       `To: ${safeTo}`,
@@ -214,7 +210,6 @@ export async function sendEmailAsStudent(
       `Subject: ${safeSubject}`,
     ].filter(Boolean);
     const parts: string[] = [];
-    // Parça 1: HTML gövde
     const bodyBase64 = Buffer.from(bodyContent, "utf-8").toString("base64");
     const bodyLines = bodyBase64.match(/.{1,76}/g) ?? [];
     parts.push(
@@ -223,7 +218,6 @@ export async function sendEmailAsStudent(
       "Content-Transfer-Encoding: base64\r\n\r\n" +
       bodyLines.join("\r\n") + "\r\n"
     );
-    // Parça 2+: ekler
     for (const a of attachments) {
       const lines = a.contentBase64.match(/.{1,76}/g) ?? [a.contentBase64];
       const safeName = a.name.replace(/[\r\n"]/g, "_");
@@ -270,7 +264,6 @@ export type MessageAttachmentMeta = {
   attachmentId: string;
 };
 
-/** Mesajdaki eklerin listesini döndürür (metadata). */
 export async function getMessageAttachments(
   studentId: string,
   gmailMessageId: string
@@ -299,7 +292,6 @@ export async function getMessageAttachments(
   return out;
 }
 
-/** Tek bir eki indirir (base64url → buffer). */
 export async function getAttachment(
   studentId: string,
   gmailMessageId: string,

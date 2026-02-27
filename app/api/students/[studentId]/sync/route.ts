@@ -26,14 +26,6 @@ export async function POST(
     );
   }
 
-  try {
-    const result = await syncStudentInbox(studentId);
-    return NextResponse.json(result);
-  } catch (e) {
-    console.error("Sync error:", e);
-    return NextResponse.json(
-      { error: "Sync failed. Token may be expired." },
-      { status: 500 }
-    );
-  }
+  const result = await syncStudentInbox(studentId);
+  return NextResponse.json(result);
 }

@@ -58,7 +58,7 @@ export default async function DashboardPage() {
           Danışmanınla süreçlerini yürütebilmesi için Gmail hesabını güvenli bir şekilde bağlaman gerekiyor. Bağlantıyı <strong>Ayarlar</strong> sayfasından da yapabilirsin.
         </p>
 
-        {/* Öğretici: Ne yapacaksın */}
+
         <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 mb-6">
           <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2 mb-3">
             <span className="material-icons-outlined text-primary text-lg">list_alt</span>
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
           </ol>
         </div>
 
-        {/* Güvenlik notu */}
+
         <div className="flex gap-3 p-3 sm:p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 mb-8">
           <span className="material-icons-outlined text-emerald-600 dark:text-emerald-400 text-xl shrink-0">verified_user</span>
           <div className="text-sm text-emerald-800 dark:text-emerald-200">

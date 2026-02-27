@@ -6,7 +6,7 @@ import { verifyOAuthState } from "@/lib/oauth-state";
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
-  const state = req.nextUrl.searchParams.get("state"); // studentId
+  const state = req.nextUrl.searchParams.get("state");
   const error = req.nextUrl.searchParams.get("error");
   const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
@@ -54,7 +54,6 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  // Öğrenci kendi Gmail'ini bağladıysa dashboard'a, danışman öğrenci sayfasına yönlendir
   const studentUser = await prisma.user.findFirst({
     where: { studentId, role: "STUDENT" },
   });

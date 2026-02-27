@@ -1,6 +1,6 @@
 # Apply2Campus – Consultant Portal MVP
 
-A consultant portal where consultants manage 600+ students. Each student connects their Gmail via Google OAuth. Consultants can view their assigned students, open a student profile, view that student's Gmail inbox (synced via Gmail API), read email threads, and reply/send emails **from the student's Gmail account** (via Gmail API with OAuth). Admins can see all students and system health/audit logs.
+A consultant portal where consultants manage 600+ students. Each student connects their Gmail via **Google OAuth**. Consultants can view their assigned students, open a student profile, view that student's Gmail inbox (synced via Gmail API), read email threads, and reply/send emails **from the student's Gmail account** (via Gmail API with OAuth). Admins can see all students and system health/audit logs.
 
 ## Tech Stack
 

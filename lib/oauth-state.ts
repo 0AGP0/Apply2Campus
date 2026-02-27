@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-const STATE_TTL_MS = 10 * 60 * 1000; // 10 dakika
+const STATE_TTL_MS = 10 * 60 * 1000;
 
 function getSecret(): string {
   const secret = process.env.NEXTAUTH_SECRET;
@@ -10,9 +10,6 @@ function getSecret(): string {
   return secret;
 }
 
-/**
- * OAuth state parametresini imzalar (callback'te sahtecilik önlenir).
- */
 export function signOAuthState(studentId: string): string {
   const payload = JSON.stringify({
     studentId,
@@ -25,9 +22,6 @@ export function signOAuthState(studentId: string): string {
   return `${encoded}.${sig}`;
 }
 
-/**
- * OAuth state'i doğrular ve studentId döndürür; geçersizse null.
- */
 export function verifyOAuthState(state: string): string | null {
   if (!state || typeof state !== "string") return null;
   const dot = state.indexOf(".");

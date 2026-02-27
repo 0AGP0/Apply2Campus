@@ -20,6 +20,7 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined&display=swap"
           rel="stylesheet"
+          crossOrigin="anonymous"
         />
       </head>
       <body className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen antialiased">

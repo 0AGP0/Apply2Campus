@@ -371,17 +371,17 @@ model Folder {
 }
 
 model GmailConnection {
-  id                  String                @id @default(cuid())
-  studentId            String                @unique
-  provider             String                @default("gmail")
-  accessTokenEncrypted String?
+  id                    String                @id @default(cuid())
+  studentId             String                @unique
+  provider              String                @default("gmail")
+  accessTokenEncrypted  String?
   refreshTokenEncrypted String?
-  expiryDate          DateTime?
-  status               GmailConnectionStatus @default(disconnected)
-  lastSyncAt           DateTime?
-  scopes               String?
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  expiryDate            DateTime?
+  status                GmailConnectionStatus @default(disconnected)
+  lastSyncAt            DateTime?
+  scopes                String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
