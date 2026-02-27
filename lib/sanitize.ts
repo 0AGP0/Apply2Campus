@@ -1,35 +1,43 @@
 import filterXSS from "xss";
 
+/** E-posta HTML'inde izin verilen tag ve attribute'lar. Gmail vb. maillerde stil ve tablo düzeni için style/width/bgcolor vb. gerekir. */
 const EMAIL_WHITELIST: Record<string, string[]> = {
-  p: [],
+  p: ["style"],
   br: [],
-  div: [],
-  span: [],
-  a: ["href", "target", "rel", "title"],
-  strong: [],
-  b: [],
-  em: [],
-  i: [],
-  u: [],
-  s: [],
-  strike: [],
-  ul: [],
-  ol: [],
-  li: [],
-  h1: [], h2: [], h3: [], h4: [], h5: [], h6: [],
-  table: [], thead: [], tbody: [], tr: [], th: [], td: [],
-  img: ["src", "alt", "title"],
-  blockquote: [],
-  pre: [],
-  code: [],
-  hr: [],
-  sub: [],
-  sup: [],
+  div: ["style"],
+  span: ["style"],
+  a: ["href", "target", "rel", "title", "style"],
+  strong: ["style"],
+  b: ["style"],
+  em: ["style"],
+  i: ["style"],
+  u: ["style"],
+  s: ["style"],
+  strike: ["style"],
+  ul: ["style"],
+  ol: ["style"],
+  li: ["style"],
+  h1: ["style"], h2: ["style"], h3: ["style"], h4: ["style"], h5: ["style"], h6: ["style"],
+  table: ["style", "width", "height", "align", "cellpadding", "cellspacing", "border"],
+  thead: ["style"],
+  tbody: ["style"],
+  tr: ["style"],
+  th: ["style", "width", "height", "align", "valign", "bgcolor"],
+  td: ["style", "width", "height", "align", "valign", "bgcolor"],
+  img: ["src", "alt", "title", "style", "width", "height"],
+  blockquote: ["style"],
+  pre: ["style"],
+  code: ["style"],
+  hr: ["style"],
+  sub: ["style"],
+  sup: ["style"],
+  font: ["size", "color", "face", "style"],
 };
 
 /**
  * E-posta HTML içeriğini XSS'e karşı güvenli hale getirir.
  * Gmail gibi tam sayfa HTML (<!DOCTYPE><html><body>...) gelirse sadece body içeriği alınır, böylece render edilebilir.
+ * style attribute'ları xss'in cssfilter'ı ile filtrelenir.
  */
 export function sanitizeEmailHtml(html: string | null | undefined): string {
   if (html == null || html === "") return "";
@@ -37,7 +45,9 @@ export function sanitizeEmailHtml(html: string | null | undefined): string {
   // Tam sayfa HTML ise sadece <body> içeriğini al (aksi halde xss whitelist dışı tag'ler yüzünden tümü escape edilip metin gibi görünür)
   const bodyMatch = content.match(/<body[^>]*>([\s\S]*)<\/body\s*>/i);
   if (bodyMatch) content = bodyMatch[1];
-  return filterXSS(content, { whiteList: EMAIL_WHITELIST });
+  return filterXSS(content, {
+    whiteList: EMAIL_WHITELIST,
+  });
 }
 
 /**
