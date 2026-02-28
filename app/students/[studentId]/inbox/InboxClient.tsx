@@ -727,11 +727,17 @@ export function InboxClient({
                         </div>
                       </div>
                       <div
-                        className="prose prose-slate dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300"
-                        dangerouslySetInnerHTML={{
-                          __html: safeEmailBodyHtml(m.bodyHtml, m.snippet),
-                        }}
-                      />
+                        className="email-body-iframe-wrapper rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700"
+                        style={{ minHeight: 200 }}
+                      >
+                        <iframe
+                          title="E-posta içeriği"
+                          sandbox="allow-same-origin allow-popups"
+                          srcDoc={safeEmailBodyHtml(m.bodyHtml, m.snippet)}
+                          className="w-full border-0 min-h-[200px]"
+                          style={{ height: "min(600px, 70vh)" }}
+                        />
+                      </div>
                       {m.gmailMessageId === selectedId && (threadDetail.message.attachments?.length ?? 0) > 0 && (
                         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">

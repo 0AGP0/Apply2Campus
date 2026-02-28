@@ -61,10 +61,39 @@ export function snippetToSafeHtml(snippet: string | null | undefined): string {
 
 /**
  * E-posta gövdesi veya snippet için tek noktadan güvenli HTML döndürür.
+ * E-posta varsa iframe için minimal sanitize edilmiş HTML döner (Gmail gibi tam render).
+ * Yoksa snippet düz metin olarak.
  */
 export function safeEmailBodyHtml(bodyHtml: string | null | undefined, snippet?: string | null): string {
-  if (bodyHtml != null && bodyHtml !== "") return sanitizeEmailHtml(bodyHtml);
+  if (bodyHtml != null && bodyHtml !== "") return sanitizeEmailForIframe(bodyHtml);
   return snippetToSafeHtml(snippet ?? "");
+}
+
+/**
+ * E-postayı iframe'de Gmail gibi göstermek için minimal sanitizasyon.
+ * Sadece tehlikeli öğeler (script, iframe, event handler, javascript:) kaldırılır;
+ * HTML, CSS, link, meta, stil tamamen korunur.
+ * Iframe sandbox ile script zaten çalışmaz; bu ek güvenlik.
+ */
+export function sanitizeEmailForIframe(html: string | null | undefined): string {
+  if (html == null || html === "") return "";
+  let s = html.trim();
+  // <script>...</script> ve <script src="..."> kaldır
+  s = s.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, "");
+  s = s.replace(/<script\b[^>]*\/?>/gi, "");
+  // <iframe>, <object>, <embed> kaldır
+  s = s.replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe\s*>/gi, "");
+  s = s.replace(/<iframe\b[^>]*\/?>/gi, "");
+  s = s.replace(/<object\b[^>]*>[\s\S]*?<\/object\s*>/gi, "");
+  s = s.replace(/<object\b[^>]*\/?>/gi, "");
+  s = s.replace(/<embed\b[^>]*\/?>/gi, "");
+  // Event handler attribute'ları kaldır (onclick, onload, onerror vb.)
+  s = s.replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, "");
+  s = s.replace(/\s+on\w+\s*=\s*[^\s>]+/gi, "");
+  // javascript: ve vbscript: href/src'de # ile değiştir
+  s = s.replace(/((?:href|src)\s*=\s*["'])\s*javascript:[^"']*(["'])/gi, "$1#$2");
+  s = s.replace(/((?:href|src)\s*=\s*["'])\s*vbscript:[^"']*(["'])/gi, "$1#$2");
+  return s;
 }
 
 /** HTTP header'da kullanılacak dosya adını güvenli hale getirir (CR/LF ve kontrol karakterleri kaldırılır). */
