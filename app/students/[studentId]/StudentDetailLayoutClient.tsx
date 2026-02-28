@@ -19,19 +19,17 @@ export function StudentDetailLayoutClient({
 
   if (isInbox) {
     return (
-      <div className="panel-layout flex flex-col min-h-screen">
-        <div className="overflow-y-auto flex-1 min-h-0 flex flex-col">
-          <Link
-            href={`/students/${studentId}`}
-            className="shrink-0 flex items-center gap-2 py-2 text-sm text-slate-500 hover:text-primary transition-colors"
-            aria-label="Öğrenci detayına dön"
-          >
-            <span className="material-icons-outlined text-lg">arrow_back</span>
-            {studentName}
-          </Link>
-          <div className="flex-1 min-h-screen flex flex-col overflow-hidden">
-            {children}
-          </div>
+      <div className="flex flex-col min-h-full w-full px-4 sm:px-6 py-2">
+        <Link
+          href={`/students/${studentId}`}
+          className="shrink-0 flex items-center gap-2 py-2 -mt-1 -mx-1 text-sm text-slate-500 hover:text-primary transition-colors w-fit"
+          aria-label="Öğrenci detayına dön"
+        >
+          <span className="material-icons-outlined text-lg">arrow_back</span>
+          {studentName}
+        </Link>
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden mt-1">
+          {children}
         </div>
       </div>
     );
