@@ -495,7 +495,7 @@ export function InboxClient({
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       {/* Üst bar: mobil tabs + aksiyonlar (layout header zaten layout tarafından sağlanıyor) */}
       <div className="shrink-0 flex flex-col border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2">
+        <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-1.5">
           <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
             {label === "SENT" ? "Gönderilen" : "Gelen kutusu"}
           </div>
@@ -505,13 +505,13 @@ export function InboxClient({
         <div className="md:hidden flex">
         <Link
           href={`${basePath}/inbox`}
-          className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${label === "INBOX" && !folderId ? "text-primary border-b-2 border-primary" : "text-slate-500 dark:text-slate-400"}`}
+          className={`flex-1 py-2 text-center text-sm font-medium transition-colors ${label === "INBOX" && !folderId ? "text-primary border-b-2 border-primary" : "text-slate-500 dark:text-slate-400"}`}
         >
           Gelen kutusu
         </Link>
         <Link
           href={`${basePath}/inbox?label=SENT`}
-          className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${label === "SENT" ? "text-primary border-b-2 border-primary" : "text-slate-500 dark:text-slate-400"}`}
+          className={`flex-1 py-2 text-center text-sm font-medium transition-colors ${label === "SENT" ? "text-primary border-b-2 border-primary" : "text-slate-500 dark:text-slate-400"}`}
         >
           Gönderilen
         </Link>

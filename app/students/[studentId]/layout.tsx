@@ -35,7 +35,7 @@ export default async function StudentDetailLayout({
       subtitle="Öğrenci detayı"
       sticky
     >
-      <nav className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-3 overflow-x-auto">
+      <nav className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-2 overflow-x-auto shrink-0">
         <Link href="/students" className="hover:text-primary transition-colors shrink-0">
           Öğrenciler
         </Link>
@@ -45,7 +45,7 @@ export default async function StudentDetailLayout({
         </span>
       </nav>
       <StudentDetailNav studentId={studentId} />
-      <div className="mt-3 sm:mt-4 pb-6 sm:pb-8">{children}</div>
+      <div className="mt-2 min-h-0 flex-1 flex flex-col overflow-hidden">{children}</div>
     </PanelLayout>
   );
 }

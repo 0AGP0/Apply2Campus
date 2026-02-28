@@ -29,7 +29,7 @@ export function StudentDetailNav({ studentId }: { studentId: string }) {
             <li key={tab.label} className="shrink-0">
               <Link
                 href={href}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   active
                     ? "border-primary text-primary bg-primary/5"
                     : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
