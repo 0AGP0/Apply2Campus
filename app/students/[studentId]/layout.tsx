@@ -45,7 +45,7 @@ export default async function StudentDetailLayout({
         </span>
       </nav>
       <StudentDetailNav studentId={studentId} />
-      <div className="mt-4 sm:mt-6">{children}</div>
+      <div className="mt-3 sm:mt-4 pb-6 sm:pb-8">{children}</div>
     </PanelLayout>
   );
 }
