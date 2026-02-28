@@ -44,7 +44,7 @@ export default async function InboxPage({
   if (!student) notFound();
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+    <div className="h-[calc(100dvh-200px)] min-h-[400px] flex flex-col overflow-hidden">
       <InboxClient
         studentId={studentId}
         studentName={student.name}

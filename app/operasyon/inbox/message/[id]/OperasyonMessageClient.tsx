@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { EmailBodyIframe } from "@/components/EmailBodyIframe";
 import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 type Message = {
@@ -170,14 +171,8 @@ export function OperasyonMessageClient({
                     : ""}
                 </div>
               </div>
-                <div className="email-body-iframe-wrapper rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700" style={{ minHeight: 200 }}>
-                  <iframe
-                    title="E-posta içeriği"
-                    sandbox="allow-same-origin allow-popups"
-                    srcDoc={safeEmailBodyHtml(m.bodyHtml, m.snippet)}
-                    className="w-full border-0 min-h-[200px]"
-                    style={{ height: "min(600px, 70vh)" }}
-                  />
+                <div className="email-body-iframe-wrapper rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                  <EmailBodyIframe html={safeEmailBodyHtml(m.bodyHtml, m.snippet)} />
                 </div>
             </div>
           ))}

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ComposeModal } from "@/components/ComposeModal";
+import { EmailBodyIframe } from "@/components/EmailBodyIframe";
 import { safeEmailBodyHtml } from "@/lib/sanitize";
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -523,8 +524,8 @@ export function InboxClient({
         <SidebarContent />
       </aside>
 
-      {/* List pane: full width on mobile when no selection, fixed width on desktop */}
-      <section className={`border-r border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-900/50 flex flex-col shrink-0 min-h-0
+      {/* List pane: scroll sadece bu bölümde; üst bar + arama sabit, liste kayar */}
+      <section className={`border-r border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-900/50 flex flex-col shrink-0 min-h-0 overflow-hidden
         ${showDetailOnMobile ? "hidden md:flex w-[400px]" : "flex-1 md:flex-initial md:w-[400px] min-w-0"}`}>
         <div className="p-3 sm:p-4 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -726,17 +727,8 @@ export function InboxClient({
                           {m.internalDate ? new Date(m.internalDate).toLocaleString() : ""}
                         </div>
                       </div>
-                      <div
-                        className="email-body-iframe-wrapper rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700"
-                        style={{ minHeight: 200 }}
-                      >
-                        <iframe
-                          title="E-posta içeriği"
-                          sandbox="allow-same-origin allow-popups"
-                          srcDoc={safeEmailBodyHtml(m.bodyHtml, m.snippet)}
-                          className="w-full border-0 min-h-[200px]"
-                          style={{ height: "min(600px, 70vh)" }}
-                        />
+                      <div className="email-body-iframe-wrapper rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <EmailBodyIframe html={safeEmailBodyHtml(m.bodyHtml, m.snippet)} />
                       </div>
                       {m.gmailMessageId === selectedId && (threadDetail.message.attachments?.length ?? 0) > 0 && (
                         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
