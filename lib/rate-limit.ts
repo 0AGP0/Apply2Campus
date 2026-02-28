@@ -49,6 +49,32 @@ export function checkRegisterRateLimit(ip: string): boolean {
 
 const MAX_LOGIN_ATTEMPTS_PER_EMAIL = 10;
 
+/** Sync: öğrenci başına 5 dakikada en fazla 1 sync (CASA anti-automation, DoS koruması) */
+const SYNC_WINDOW_MS = 5 * 60 * 1000;
+const MAX_SYNC_PER_STUDENT = 1;
+
+export function checkSyncRateLimit(studentId: string): boolean {
+  cleanup();
+  const k = `sync:${studentId}`;
+  const now = Date.now();
+  const entry = store.get(k);
+  if (!entry || now >= entry.resetAt) return true;
+  return entry.count < MAX_SYNC_PER_STUDENT;
+}
+
+export function recordSyncAttempt(studentId: string): void {
+  cleanup();
+  const k = `sync:${studentId}`;
+  const now = Date.now();
+  const entry = store.get(k);
+  if (!entry || now >= entry.resetAt) {
+    store.set(k, { count: 1, resetAt: now + SYNC_WINDOW_MS });
+    return;
+  }
+  entry.count++;
+  store.set(k, entry);
+}
+
 /**
  * Login için: email başına 15 dakikada en fazla MAX_LOGIN_ATTEMPTS_PER_EMAIL deneme.
  */

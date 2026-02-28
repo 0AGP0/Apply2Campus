@@ -527,8 +527,8 @@ export function InboxClient({
       {/* List pane: scroll sadece bu bölümde; üst bar + arama sabit, liste kayar */}
       <section className={`border-r border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-900/50 flex flex-col shrink-0 min-h-0 overflow-hidden
         ${showDetailOnMobile ? "hidden md:flex w-[400px]" : "flex-1 md:flex-initial md:w-[400px] min-w-0"}`}>
-        <div className="p-3 sm:p-4 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="p-3 sm:p-4 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
             <button
               onClick={handleSync}
               disabled={connectionStatus !== "connected" || syncing}
@@ -537,10 +537,33 @@ export function InboxClient({
             >
               refresh
             </button>
+            <span className="text-[11px] font-medium text-slate-500">
+              {(page - 1) * 50 + 1}–{Math.min(page * 50, total)} / {total}
+            </span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500 shrink-0">
-            <span>1-{messages.length} / {total}</span>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed"
+              >
+                ← Önceki
+              </button>
+              <span className="text-[11px] text-slate-500">
+                Sayfa {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="text-[11px] font-medium px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:cursor-not-allowed"
+              >
+                Sonraki →
+              </button>
+            </div>
+          )}
         </div>
         <div className="p-2 shrink-0 border-b border-slate-200 dark:border-slate-800">
             <div className="relative">

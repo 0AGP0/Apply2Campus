@@ -15,7 +15,7 @@ Portalda her madde için **Applicable?** sütununda **Yes** veya **No** seçecek
 | 5 | **Yes** | Protection levels applied: passwords bcrypt hashed; Gmail tokens AES-256-GCM encrypted; PII in DB; HTTPS in production; Cache-Control no-store for sensitive pages. |
 | 6 | **Yes** | Integrity: external scripts use crossorigin=anonymous; SRI used where feasible. No execution of code from untrusted sources; only Google Fonts (trusted CDN). |
 | 7 | **Yes** | We use only our own domain (apply2campus.com). No orphan subdomains or CNAMEs; DNS and hosting under our control. |
-| 8 | **Yes** | Anti-automation: rate limiting on login (per email) and registration (per IP). Limits applied server-side. |
+| 8 | **Yes** | Anti-automation: rate limiting on login (per email), registration (per IP), and Gmail sync (per studentId, 1 per 5 min). Limits applied server-side. |
 | 9 | **Yes** | User-uploaded files stored under data/uploads (or UPLOAD_DIR), outside web-accessible root. Permissions and path sanitization (safeBasename) applied. |
 | 10 | **No** | Server-side antivirus scanning on uploads not implemented. Uploads are validated by type and size; consider adding AV in future. |
 | 11 | **Yes** | API keys and secrets in environment variables only. Session tokens in httpOnly cookies. No sensitive data in URLs or query strings. |

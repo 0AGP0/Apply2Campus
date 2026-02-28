@@ -71,31 +71,85 @@ export async function getGmailClientForStudent(studentId: string) {
   return gmail;
 }
 
-export async function syncStudentInbox(studentId: string, maxResults = 50) {
+/** Gmail API ile tüm sayfaları çek (pageToken ile). maxPages: her etiket için kaç sayfa. */
+async function fetchAllMessageIds(
+  gmail: Awaited<ReturnType<typeof getGmailClientForStudent>>,
+  labelIds: string[],
+  maxResults: number,
+  maxPages: number
+): Promise<{ id: string }[]> {
+  if (!gmail) return [];
+  const seen = new Set<string>();
+  const result: { id: string }[] = [];
+
+  for (const labelId of labelIds) {
+    let pageToken: string | undefined;
+    let pages = 0;
+    do {
+      const res = await gmail.users.messages.list({
+        userId: "me",
+        maxResults,
+        labelIds: [labelId],
+        pageToken,
+      });
+      for (const m of res.data.messages ?? []) {
+        if (m.id && !seen.has(m.id)) {
+          seen.add(m.id);
+          result.push({ id: m.id });
+        }
+      }
+      pageToken = res.data.nextPageToken ?? undefined;
+      pages++;
+    } while (pageToken && pages < maxPages);
+  }
+  return result;
+}
+
+export async function syncStudentInbox(
+  studentId: string,
+  maxResults = 500,
+  maxPages = 5
+) {
   const gmail = await getGmailClientForStudent(studentId);
   if (!gmail) return { synced: 0, error: "No valid connection" };
 
-  const [inboxList, sentList] = await Promise.all([
-    gmail.users.messages.list({ userId: "me", maxResults, labelIds: ["INBOX"] }),
-    gmail.users.messages.list({ userId: "me", maxResults, labelIds: ["SENT"] }),
-  ]);
-  const seen = new Set<string>();
-  const messages: { id: string }[] = [];
-  for (const m of inboxList.data.messages ?? []) {
-    if (m.id && !seen.has(m.id)) {
-      seen.add(m.id);
-      messages.push({ id: m.id });
-    }
+  const allIds = await fetchAllMessageIds(
+    gmail,
+    ["INBOX", "SENT"],
+    maxResults,
+    maxPages
+  );
+  if (allIds.length === 0) {
+    await prisma.gmailConnection.update({
+      where: { studentId },
+      data: { lastSyncAt: new Date() },
+    });
+    return { synced: 0 };
   }
-  for (const m of sentList.data.messages ?? []) {
-    if (m.id && !seen.has(m.id)) {
-      seen.add(m.id);
-      messages.push({ id: m.id });
-    }
-  }
-  let synced = 0;
 
-  for (const m of messages) {
+  // Veritabanında olmayanları önceliklendir; her çalıştırmada max 300 sync (timeout riski)
+  const idsToCheck = allIds
+    .slice(0, 5000)
+    .map((x) => x.id)
+    .filter((id): id is string => !!id);
+  const existingIds = idsToCheck.length
+    ? await prisma.emailMessage.findMany({
+        where: { studentId, gmailMessageId: { in: idsToCheck } },
+        select: { gmailMessageId: true },
+      })
+    : [];
+  const existingSet = new Set(existingIds.map((r) => r.gmailMessageId));
+  const toSync = allIds.filter((x) => x.id && !existingSet.has(x.id)).slice(0, 300);
+  if (toSync.length === 0) {
+    await prisma.gmailConnection.update({
+      where: { studentId },
+      data: { lastSyncAt: new Date() },
+    });
+    return { synced: 0 };
+  }
+
+  let synced = 0;
+  for (const m of toSync) {
     if (!m.id) continue;
     const full = await gmail.users.messages.get({
       userId: "me",

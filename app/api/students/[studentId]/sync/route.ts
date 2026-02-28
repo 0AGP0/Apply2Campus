@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
+import { checkSyncRateLimit, recordSyncAttempt } from "@/lib/rate-limit";
 import { syncStudentInbox } from "@/lib/gmail";
 import { prisma } from "@/lib/db";
 
@@ -16,6 +17,13 @@ export async function POST(
   const ok = await canAccessStudent(session.user.id, role, studentId, sessionStudentId);
   if (!ok) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+  if (!checkSyncRateLimit(studentId)) {
+    return NextResponse.json(
+      { error: "Çok sık senkronizasyon denemesi. Lütfen 5 dakika sonra tekrar deneyin." },
+      { status: 429 }
+    );
+  }
+
   const conn = await prisma.gmailConnection.findUnique({
     where: { studentId },
   });
@@ -26,6 +34,7 @@ export async function POST(
     );
   }
 
+  recordSyncAttempt(studentId);
   const result = await syncStudentInbox(studentId);
   return NextResponse.json(result);
 }
