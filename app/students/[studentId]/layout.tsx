@@ -2,9 +2,7 @@ import { getServerSession, authOptions } from "@/lib/auth";
 import { canAccessStudent } from "@/lib/rbac";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import Link from "next/link";
-import { PanelLayout } from "@/components/PanelLayout";
-import { StudentDetailNav } from "./StudentDetailNav";
+import { StudentDetailLayoutClient } from "./StudentDetailLayoutClient";
 
 export default async function StudentDetailLayout({
   children,
@@ -28,24 +26,8 @@ export default async function StudentDetailLayout({
   if (!student) notFound();
 
   return (
-    <PanelLayout
-      backHref="/students"
-      backLabel="Öğrenci listesine dön"
-      title={student.name}
-      subtitle="Öğrenci detayı"
-      sticky
-    >
-      <nav className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-2 overflow-x-auto shrink-0">
-        <Link href="/students" className="hover:text-primary transition-colors shrink-0">
-          Öğrenciler
-        </Link>
-        <span className="material-icons-outlined text-xs shrink-0">chevron_right</span>
-        <span className="text-slate-900 dark:text-slate-200 font-medium truncate">
-          {student.name}
-        </span>
-      </nav>
-      <StudentDetailNav studentId={studentId} />
-      <div className="mt-2 min-h-0 flex-1 flex flex-col overflow-hidden">{children}</div>
-    </PanelLayout>
+    <StudentDetailLayoutClient studentId={studentId} studentName={student.name}>
+      {children}
+    </StudentDetailLayoutClient>
   );
 }
